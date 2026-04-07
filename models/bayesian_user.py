@@ -5,10 +5,12 @@ from core.interfaces import IPreferenceModel
 from config.settings import ModelConfig
 
 class BayesianPreferenceModel(IPreferenceModel):
-    def __init__(self, d: int, m0: Optional[npt.NDArray[np.float64]] = None, S0: Optional[npt.NDArray[np.float64]] = None, config: ModelConfig = ModelConfig()):
+    def __init__(self, d: int, m0: Optional[npt.NDArray[np.float64]] = None, S0: Optional[npt.NDArray[np.float64]] = None, config: Optional[ModelConfig] = None):
         self.d = d
         self.m = np.zeros(d) if m0 is None else np.array(m0, dtype=np.float64)
         self.S = np.eye(d) if S0 is None else np.array(S0, dtype=np.float64)
+        if config is None:
+            config = ModelConfig()
         self.sigma2 = config.sigma2
 
     def update(self, x: npt.NDArray[np.float64], y: float) -> None:
