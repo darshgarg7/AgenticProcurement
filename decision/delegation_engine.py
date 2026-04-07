@@ -5,9 +5,9 @@ from core.interfaces import IDecisionEngine, IPreferenceModel, Observation, Acti
 from config.settings import EngineConfig
 
 class DelegationEngine(IDecisionEngine):
-    def __init__(self, model: IPreferenceModel, config: EngineConfig = EngineConfig()):
+    def __init__(self, model: IPreferenceModel, config: EngineConfig | None = None):
         self.model = model
-        self.config = config
+        self.config = EngineConfig() if config is None else config
         
     def compute_worst_case_regret(self, X: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         thetas = self.model.sample_theta(self.config.num_samples) # (N, d)
