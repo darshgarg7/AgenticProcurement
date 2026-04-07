@@ -151,7 +151,7 @@ def run_experiment(data_path: str, num_episodes: int = 50, d: int = 8) -> None:
             'purchase_rate': len(purchases) / len(results) if results else 0,
             'avg_queries': np.mean([r['queries'] for r in results]) if results else 0,
             'avg_realized_regret': np.mean([r['realized_regret'] for r in purchases]) if purchases else 0.0,
-            'max_est_wc_regret': np.mean([r['estimated_worst_case_regret'] for r in purchases]) if purchases else 0.0,
+            'max_est_wc_regret': np.max([r['estimated_worst_case_regret'] for r in purchases]) if purchases else 0.0,
             'exceedance_rate': np.mean([1 if r['exceeded_regret'] else 0 for r in purchases]) if purchases else 0.0
         }
         
