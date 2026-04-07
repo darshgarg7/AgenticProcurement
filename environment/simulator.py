@@ -4,8 +4,8 @@ from core.interfaces import IMarketEnvironment, Observation
 from config.settings import EnvConfig
 
 class StochasticMarket(IMarketEnvironment):
-    def __init__(self, config: EnvConfig = EnvConfig()):
-        self.config = config
+    def __init__(self, config: EnvConfig | None = None):
+        self.config = config if config is not None else EnvConfig()
         self.items = pd.read_csv(self.config.data_path)
         self.available_indices = list(self.items.index)
         
