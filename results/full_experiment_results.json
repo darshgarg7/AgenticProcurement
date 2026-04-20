@@ -1,0 +1,2006 @@
+{
+  "agent_vs_baseline": {
+    "agent": {
+      "results": [
+        {
+          "queries": 14,
+          "delays": 16,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 5,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.010571326981360318,
+          "estimated_worst_case_regret": 0.6962005969607042,
+          "exceeded_regret": false,
+          "steps_taken": 6
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.4621600786573588,
+          "exceeded_regret": false,
+          "steps_taken": 1
+        },
+        {
+          "queries": 12,
+          "delays": 5,
+          "purchased": true,
+          "realized_regret": 0.21468160356149207,
+          "estimated_worst_case_regret": 1.1076544048946513,
+          "exceeded_regret": false,
+          "steps_taken": 18
+        },
+        {
+          "queries": 15,
+          "delays": 15,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.103457095907181,
+          "estimated_worst_case_regret": 1.0310545628894305,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 14,
+          "delays": 16,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 12,
+          "delays": 5,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.9098216032203768,
+          "exceeded_regret": false,
+          "steps_taken": 18
+        },
+        {
+          "queries": 10,
+          "delays": 3,
+          "purchased": true,
+          "realized_regret": 0.12252859580677716,
+          "estimated_worst_case_regret": 0.9510947004645259,
+          "exceeded_regret": false,
+          "steps_taken": 14
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 10,
+          "delays": 15,
+          "purchased": true,
+          "realized_regret": 0.17152075178491277,
+          "estimated_worst_case_regret": 0.9022490157922338,
+          "exceeded_regret": false,
+          "steps_taken": 26
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0786920188838301,
+          "estimated_worst_case_regret": 0.888993873030357,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 7,
+          "delays": 2,
+          "purchased": true,
+          "realized_regret": 0.06533030584098021,
+          "estimated_worst_case_regret": 0.8848136637595869,
+          "exceeded_regret": false,
+          "steps_taken": 10
+        },
+        {
+          "queries": 12,
+          "delays": 13,
+          "purchased": true,
+          "realized_regret": 0.006767596023085021,
+          "estimated_worst_case_regret": 0.8591525600503561,
+          "exceeded_regret": false,
+          "steps_taken": 26
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 5,
+          "delays": 25,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 9,
+          "delays": 21,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 1,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.8258441607416799,
+          "exceeded_regret": false,
+          "steps_taken": 2
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 11,
+          "delays": 13,
+          "purchased": true,
+          "realized_regret": 0.18191819310020652,
+          "estimated_worst_case_regret": 0.9519468304501709,
+          "exceeded_regret": false,
+          "steps_taken": 25
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.04010952947071489,
+          "estimated_worst_case_regret": 0.6855999652255358,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 2,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.09143189351342262,
+          "estimated_worst_case_regret": 0.6463497594513032,
+          "exceeded_regret": false,
+          "steps_taken": 3
+        },
+        {
+          "queries": 9,
+          "delays": 21,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 7,
+          "purchased": true,
+          "realized_regret": 0.093439890537999,
+          "estimated_worst_case_regret": 0.9692710062256996,
+          "exceeded_regret": false,
+          "steps_taken": 14
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 5,
+          "delays": 1,
+          "purchased": true,
+          "realized_regret": 0.014811294593560231,
+          "estimated_worst_case_regret": 0.9874556226246537,
+          "exceeded_regret": false,
+          "steps_taken": 7
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.040027807322130154,
+          "estimated_worst_case_regret": 0.8134664783216511,
+          "exceeded_regret": false,
+          "steps_taken": 1
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 4,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.05748031028176903,
+          "estimated_worst_case_regret": 0.5679518095197439,
+          "exceeded_regret": false,
+          "steps_taken": 5
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 7,
+          "delays": 12,
+          "purchased": true,
+          "realized_regret": 0.08198708700798718,
+          "estimated_worst_case_regret": 0.8725754847809403,
+          "exceeded_regret": false,
+          "steps_taken": 20
+        },
+        {
+          "queries": 12,
+          "delays": 18,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.00868199145064158,
+          "estimated_worst_case_regret": 0.6887716010724695,
+          "exceeded_regret": false,
+          "steps_taken": 1
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 10,
+          "delays": 10,
+          "purchased": true,
+          "realized_regret": 0.1757277156567436,
+          "estimated_worst_case_regret": 0.6873763405233173,
+          "exceeded_regret": false,
+          "steps_taken": 21
+        },
+        {
+          "queries": 4,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.02464416067013342,
+          "estimated_worst_case_regret": 1.068153667692166,
+          "exceeded_regret": false,
+          "steps_taken": 5
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 11,
+          "delays": 9,
+          "purchased": true,
+          "realized_regret": 0.05543881771303971,
+          "estimated_worst_case_regret": 0.8798306790819792,
+          "exceeded_regret": false,
+          "steps_taken": 21
+        },
+        {
+          "queries": 6,
+          "delays": 7,
+          "purchased": true,
+          "realized_regret": 0.3130985172561069,
+          "estimated_worst_case_regret": 0.9460714858403438,
+          "exceeded_regret": false,
+          "steps_taken": 14
+        },
+        {
+          "queries": 10,
+          "delays": 2,
+          "purchased": true,
+          "realized_regret": 0.15614809831151966,
+          "estimated_worst_case_regret": 0.9432669520371152,
+          "exceeded_regret": false,
+          "steps_taken": 13
+        },
+        {
+          "queries": 5,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.017763432063411688,
+          "estimated_worst_case_regret": 0.8619538839748754,
+          "exceeded_regret": false,
+          "steps_taken": 6
+        },
+        {
+          "queries": 6,
+          "delays": 17,
+          "purchased": true,
+          "realized_regret": 0.023611717919169495,
+          "estimated_worst_case_regret": 1.050771599476024,
+          "exceeded_regret": false,
+          "steps_taken": 24
+        },
+        {
+          "queries": 9,
+          "delays": 21,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 14,
+          "purchased": true,
+          "realized_regret": 0.004685701821213195,
+          "estimated_worst_case_regret": 0.48078046069352276,
+          "exceeded_regret": false,
+          "steps_taken": 21
+        },
+        {
+          "queries": 7,
+          "delays": 23,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 2,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.9113005414193138,
+          "exceeded_regret": false,
+          "steps_taken": 3
+        },
+        {
+          "queries": 5,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.002151820263062265,
+          "estimated_worst_case_regret": 0.9368027613049441,
+          "exceeded_regret": false,
+          "steps_taken": 6
+        },
+        {
+          "queries": 5,
+          "delays": 2,
+          "purchased": true,
+          "realized_regret": 0.09694420517579311,
+          "estimated_worst_case_regret": 1.0919494788807695,
+          "exceeded_regret": false,
+          "steps_taken": 8
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 1,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.018062187205009073,
+          "estimated_worst_case_regret": 0.5721515780775556,
+          "exceeded_regret": false,
+          "steps_taken": 2
+        },
+        {
+          "queries": 10,
+          "delays": 12,
+          "purchased": true,
+          "realized_regret": 0.0755497227959816,
+          "estimated_worst_case_regret": 1.349224880549666,
+          "exceeded_regret": false,
+          "steps_taken": 23
+        },
+        {
+          "queries": 7,
+          "delays": 23,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 9,
+          "delays": 21,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 1,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08562832605217718,
+          "estimated_worst_case_regret": 0.6736016416706776,
+          "exceeded_regret": false,
+          "steps_taken": 2
+        },
+        {
+          "queries": 7,
+          "delays": 4,
+          "purchased": true,
+          "realized_regret": 0.04939618758340075,
+          "estimated_worst_case_regret": 1.0702536608820017,
+          "exceeded_regret": false,
+          "steps_taken": 12
+        },
+        {
+          "queries": 6,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2509111486080202,
+          "estimated_worst_case_regret": 0.9647138877331017,
+          "exceeded_regret": false,
+          "steps_taken": 7
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 7,
+          "delays": 1,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.9277158828642672,
+          "exceeded_regret": false,
+          "steps_taken": 9
+        },
+        {
+          "queries": 13,
+          "delays": 17,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 11,
+          "delays": 19,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 9,
+          "delays": 1,
+          "purchased": true,
+          "realized_regret": 0.34272937317486435,
+          "estimated_worst_case_regret": 0.9175707465690641,
+          "exceeded_regret": false,
+          "steps_taken": 11
+        },
+        {
+          "queries": 10,
+          "delays": 15,
+          "purchased": true,
+          "realized_regret": 0.03114504998249934,
+          "estimated_worst_case_regret": 0.9431568662701137,
+          "exceeded_regret": false,
+          "steps_taken": 26
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.025632007542697566,
+          "estimated_worst_case_regret": 0.7591858708086329,
+          "exceeded_regret": false,
+          "steps_taken": 7
+        },
+        {
+          "queries": 13,
+          "delays": 17,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 9,
+          "delays": 21,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.06612551491903496,
+          "estimated_worst_case_regret": 0.805787476231222,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 10,
+          "delays": 20,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 12,
+          "delays": 18,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 5,
+          "delays": 25,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.8951481694987962,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 7,
+          "delays": 23,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.1375181747556563,
+          "estimated_worst_case_regret": 0.6647507828373969,
+          "exceeded_regret": false,
+          "steps_taken": 1
+        },
+        {
+          "queries": 5,
+          "delays": 25,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 12,
+          "delays": 18,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 4,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.7679184203516046,
+          "exceeded_regret": false,
+          "steps_taken": 5
+        },
+        {
+          "queries": 11,
+          "delays": 14,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.8977939061390381,
+          "exceeded_regret": false,
+          "steps_taken": 26
+        },
+        {
+          "queries": 7,
+          "delays": 14,
+          "purchased": true,
+          "realized_regret": 0.03013137732908089,
+          "estimated_worst_case_regret": 1.0549392934381436,
+          "exceeded_regret": false,
+          "steps_taken": 22
+        },
+        {
+          "queries": 8,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.07069296857028395,
+          "estimated_worst_case_regret": 1.0959234566466989,
+          "exceeded_regret": false,
+          "steps_taken": 9
+        },
+        {
+          "queries": 3,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.021118259368682057,
+          "estimated_worst_case_regret": 0.9073789539769428,
+          "exceeded_regret": false,
+          "steps_taken": 4
+        },
+        {
+          "queries": 6,
+          "delays": 24,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 1,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.6207564082252296,
+          "exceeded_regret": false,
+          "steps_taken": 2
+        },
+        {
+          "queries": 7,
+          "delays": 23,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        },
+        {
+          "queries": 2,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.07137715872989775,
+          "estimated_worst_case_regret": 0.799230204056926,
+          "exceeded_regret": false,
+          "steps_taken": 3
+        },
+        {
+          "queries": 8,
+          "delays": 22,
+          "purchased": false,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false,
+          "steps_taken": 30
+        }
+      ],
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 0.5,
+        "avg_queries": 7.23,
+        "avg_delays": 12.57,
+        "avg_realized_regret": 0.07059337871071059,
+        "std_realized_regret": 0.08077652143999538,
+        "max_realized_regret": 0.34272937317486435,
+        "avg_est_wc_regret": 0.8649577543176976,
+        "exceedance_rate": 0.0
+      }
+    },
+    "baseline": {
+      "results": [
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.015863389078818013,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.059190775531741624,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.09874859726264001,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.16227777052915304,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.103457095907181,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.1537141017558021,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.5423936687502147,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2453436270849479,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0786920188838301,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2187077871748179,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2542547291933867,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.09686660494708921,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.03429836596969013,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0824685199642749,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.18537574111411187,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.15593946519548108,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.10751640525392958,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2217720625675812,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.41658803665824734,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.04010952947071489,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.4007592467246982,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.8636897708825942,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": true
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.3093074091475011,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.5021595855282478,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.09814970576621035,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.23984713663073526,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.01349241621525965,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2862011200557393,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.5207226817119537,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.040027807322130154,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.36831107397564794,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.10741126870272344,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0764522200906862,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.506172077756875,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.00868199145064158,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08647529076130711,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.10258621220215514,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.3424808983801317,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.11289424828170837,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08289559778866451,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.4138482599204886,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2651100746414082,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.15302152569621175,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.03108957135324264,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.24707840489473293,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.04295536992656401,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.019637973811218012,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.021773876280746493,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2656014745791052,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.39426316596050826,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.07769980002847199,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08794199256536062,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.018062187205009073,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.007926504351715324,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08925588758782793,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.08562832605217718,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.004056583792943533,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.11534509387155445,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.324280522751285,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.3364928052191226,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2208654820489837,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.4513638221347003,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.32369294809849103,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.6940984473708598,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.016222075532405178,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.1681705878480314,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.12601600333624485,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.24858788212175098,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.07763759405811593,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.13124554032650027,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.018702286326202536,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.016158371992089027,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.34500840349830064,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.25147604153301834,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.251523307070268,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.4532906212179657,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.028703803850986254,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.3424115461112711,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.1375181747556563,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.2883144582810273,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.17153184791985288,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.032200368403485335,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.03487078422977663,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.3058918926335419,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.0,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.35697067097915236,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        },
+        {
+          "queries": 0,
+          "delays": 0,
+          "purchased": true,
+          "realized_regret": 0.13591560439355765,
+          "estimated_worst_case_regret": 0.0,
+          "exceeded_regret": false
+        }
+      ],
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.16971754018231192,
+        "std_realized_regret": 0.17168726943711518,
+        "max_realized_regret": 0.8636897708825942,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.01
+      }
+    },
+    "config": {
+      "eps_reg": 0.8,
+      "eps_var": 0.8,
+      "num_episodes": 100
+    }
+  },
+  "personas": {
+    "budget_shopper": {
+      "agent": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 0.27,
+          "avg_queries": 8.12,
+          "avg_delays": 17.16,
+          "avg_realized_regret": 0.05710557490806153,
+          "std_realized_regret": 0.05632877336103514,
+          "max_realized_regret": 0.24274150308240083,
+          "avg_est_wc_regret": 0.8304738198541116,
+          "exceedance_rate": 0.0
+        }
+      },
+      "baseline": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 1.0,
+          "avg_queries": 0.0,
+          "avg_delays": 0.0,
+          "avg_realized_regret": 0.04881186739771318,
+          "std_realized_regret": 0.04725402700501514,
+          "max_realized_regret": 0.24274150308240083,
+          "avg_est_wc_regret": 0.0,
+          "exceedance_rate": 0.0
+        }
+      }
+    },
+    "quality_maximizer": {
+      "agent": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 0.22,
+          "avg_queries": 8.17,
+          "avg_delays": 17.6,
+          "avg_realized_regret": 0.06510485528507001,
+          "std_realized_regret": 0.05405508559512161,
+          "max_realized_regret": 0.18488851417228824,
+          "avg_est_wc_regret": 0.881411615349117,
+          "exceedance_rate": 0.0
+        }
+      },
+      "baseline": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 1.0,
+          "avg_queries": 0.0,
+          "avg_delays": 0.0,
+          "avg_realized_regret": 0.054145924045465345,
+          "std_realized_regret": 0.05194774607151285,
+          "max_realized_regret": 0.296852490191577,
+          "avg_est_wc_regret": 0.0,
+          "exceedance_rate": 0.0
+        }
+      }
+    },
+    "balanced": {
+      "agent": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 0.24,
+          "avg_queries": 6.82,
+          "avg_delays": 18.74,
+          "avg_realized_regret": 0.06516376847387152,
+          "std_realized_regret": 0.07168313954363213,
+          "max_realized_regret": 0.322167639550354,
+          "avg_est_wc_regret": 0.8747862397713405,
+          "exceedance_rate": 0.0
+        }
+      },
+      "baseline": {
+        "aggregate": {
+          "num_episodes": 100,
+          "purchase_rate": 1.0,
+          "avg_queries": 0.0,
+          "avg_delays": 0.0,
+          "avg_realized_regret": 0.0555430695375388,
+          "std_realized_regret": 0.05804423179270302,
+          "max_realized_regret": 0.322167639550354,
+          "avg_est_wc_regret": 0.0,
+          "exceedance_rate": 0.0
+        }
+      }
+    }
+  },
+  "ablations": {
+    "full_model": {
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 0.44,
+        "avg_queries": 6.78,
+        "avg_delays": 13.0,
+        "avg_realized_regret": 0.07919295109801687,
+        "std_realized_regret": 0.10648062125023207,
+        "max_realized_regret": 0.4993123353864505,
+        "avg_est_wc_regret": 0.8529261987566805,
+        "exceedance_rate": 0.0
+      }
+    },
+    "no_epistemic_gate": {
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 0.45,
+        "avg_queries": 6.91,
+        "avg_delays": 13.86,
+        "avg_realized_regret": 0.06727606518135405,
+        "std_realized_regret": 0.08753419556614207,
+        "max_realized_regret": 0.41106758183091957,
+        "avg_est_wc_regret": 0.8812863457749418,
+        "exceedance_rate": 0.0
+      }
+    },
+    "no_regret_gate": {
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 0.98,
+        "avg_queries": 0.22,
+        "avg_delays": 0.42,
+        "avg_realized_regret": 0.1674757615493405,
+        "std_realized_regret": 0.17062400262045246,
+        "max_realized_regret": 0.8636897708825942,
+        "avg_est_wc_regret": 1.348001272687813,
+        "exceedance_rate": 0.0
+      }
+    },
+    "no_market_dynamics": {
+      "aggregate": {
+        "num_episodes": 100,
+        "purchase_rate": 0.42,
+        "avg_queries": 5.44,
+        "avg_delays": 15.22,
+        "avg_realized_regret": 0.06695480040179666,
+        "std_realized_regret": 0.08042507172987139,
+        "max_realized_regret": 0.33315364600482245,
+        "avg_est_wc_regret": 0.9254107729026722,
+        "exceedance_rate": 0.0
+      }
+    }
+  },
+  "multi_seed_robustness": [
+    {
+      "outer_seed": 0,
+      "agent": {
+        "num_episodes": 50,
+        "purchase_rate": 0.58,
+        "avg_queries": 6.82,
+        "avg_delays": 10.72,
+        "avg_realized_regret": 0.10002126707581104,
+        "std_realized_regret": 0.10552103034947938,
+        "max_realized_regret": 0.36831107397564794,
+        "avg_est_wc_regret": 0.8690805919445653,
+        "exceedance_rate": 0.0
+      },
+      "baseline": {
+        "num_episodes": 50,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.18348551823854747,
+        "std_realized_regret": 0.18338113922805446,
+        "max_realized_regret": 0.8636897708825942,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.02
+      }
+    },
+    {
+      "outer_seed": 1,
+      "agent": {
+        "num_episodes": 50,
+        "purchase_rate": 0.5,
+        "avg_queries": 6.62,
+        "avg_delays": 12.44,
+        "avg_realized_regret": 0.07491201733842863,
+        "std_realized_regret": 0.09081245926006654,
+        "max_realized_regret": 0.3828001201143368,
+        "avg_est_wc_regret": 0.880634471378573,
+        "exceedance_rate": 0.0
+      },
+      "baseline": {
+        "num_episodes": 50,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.2187401306930192,
+        "std_realized_regret": 0.2227900901698925,
+        "max_realized_regret": 1.091519422758238,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.04
+      }
+    },
+    {
+      "outer_seed": 2,
+      "agent": {
+        "num_episodes": 50,
+        "purchase_rate": 0.46,
+        "avg_queries": 6.76,
+        "avg_delays": 13.08,
+        "avg_realized_regret": 0.07885803812488298,
+        "std_realized_regret": 0.09098631362102219,
+        "max_realized_regret": 0.27108668762807786,
+        "avg_est_wc_regret": 0.8152520954243544,
+        "exceedance_rate": 0.0
+      },
+      "baseline": {
+        "num_episodes": 50,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.16678094215971975,
+        "std_realized_regret": 0.18462190986079413,
+        "max_realized_regret": 0.8477906953864477,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.02
+      }
+    },
+    {
+      "outer_seed": 3,
+      "agent": {
+        "num_episodes": 50,
+        "purchase_rate": 0.44,
+        "avg_queries": 6.28,
+        "avg_delays": 14.76,
+        "avg_realized_regret": 0.06137454184258951,
+        "std_realized_regret": 0.06829071214354814,
+        "max_realized_regret": 0.25624461313254776,
+        "avg_est_wc_regret": 0.8038323753304795,
+        "exceedance_rate": 0.0
+      },
+      "baseline": {
+        "num_episodes": 50,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.13179217721207687,
+        "std_realized_regret": 0.1617662151903863,
+        "max_realized_regret": 0.6006351597049205,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.0
+      }
+    },
+    {
+      "outer_seed": 4,
+      "agent": {
+        "num_episodes": 50,
+        "purchase_rate": 0.48,
+        "avg_queries": 7.3,
+        "avg_delays": 13.44,
+        "avg_realized_regret": 0.047307776782466636,
+        "std_realized_regret": 0.09229248748625965,
+        "max_realized_regret": 0.4107705304408152,
+        "avg_est_wc_regret": 0.8628959521623454,
+        "exceedance_rate": 0.0
+      },
+      "baseline": {
+        "num_episodes": 50,
+        "purchase_rate": 1.0,
+        "avg_queries": 0.0,
+        "avg_delays": 0.0,
+        "avg_realized_regret": 0.19863458334913744,
+        "std_realized_regret": 0.19888876477225761,
+        "max_realized_regret": 0.8040603355716591,
+        "avg_est_wc_regret": 0.0,
+        "exceedance_rate": 0.02
+      }
+    }
+  ]
+}
