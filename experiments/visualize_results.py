@@ -1,13 +1,16 @@
 """
-Visualization script for test and experiment results.
+Updated visualization script that generates figures from full experiment results.
 
-Generates plots mapped to Proposal Section 7 evaluation criteria:
-  1. Agent vs Baseline: average realized regret comparison
-  2. Regret distribution (histogram) across episodes
-  3. Epistemic uncertainty decay within a single episode
-  4. Action distribution (Purchase / QueryUser / Search / Wait)
-  5. Regret exceedance rate comparison
-  6. Purchase rate across varying epistemic thresholds (sensitivity)
+Reads results/full_experiment_results.json and generates:
+  1. Agent vs Baseline regret comparison (bar chart)
+  2. Regret distribution histogram
+  3. Epistemic uncertainty decay
+  4. Action distribution pie chart
+  5. Exceedance & purchase rate comparison
+  6. Threshold sensitivity sweep
+  7. Persona comparison (grouped bar chart)           [NEW]
+  8. Ablation study results (grouped bar chart)        [NEW]
+  9. Multi-seed robustness (bar chart)                 [NEW]
 
 All figures saved to results/figures/.
 """
@@ -27,6 +30,7 @@ from models.bayesian_user import BayesianPreferenceModel
 from evaluation.metrics import MetricsTracker
 from core.interfaces import Purchase, QueryUser, Wait, Search
 from config.settings import EngineConfig, EnvConfig, ModelConfig
+from experiments.run_full_experiments import run_episode as run_agent_episode, run_baseline_episode
 
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'results')
 FIG_DIR = os.path.join(RESULTS_DIR, 'figures')
@@ -34,13 +38,22 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv'
 
 os.makedirs(FIG_DIR, exist_ok=True)
 
+
+# ── Load experiment results ─────────────────────────────────────────────────
+
+def load_results():
+    path = os.path.join(RESULTS_DIR, 'full_experiment_results.json')
+    with open(path, 'r') as f:
+        return json.load(f)
+
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
-def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=20):
+def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=30):
     """Run one episode and return per-step telemetry."""
     d = len(true_theta)
     env_config = EnvConfig(data_path=data_path)
-    engine_config = EngineConfig(eps_reg=1.0, eps_var=0.8, tau_util=0.0)
+    engine_config = EngineConfig(eps_reg=0.8, eps_var=0.8, tau_util=0.0)
     model_config = ModelConfig(sigma2=0.05)
 
     model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
@@ -106,27 +119,9 @@ def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=20
     return history
 
 
-def run_baseline(true_theta, data_path, prior_m0, prior_S0):
-    d = len(true_theta)
-    model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0)
-    env = StochasticMarket(config=EnvConfig(data_path=data_path))
-    obs = env.observe()
-    if obs.features.shape[0] == 0:
-        return {'regret': 0.0, 'purchased': False}
-    exp_utils = model.expected_utility(obs.features)
-    best_idx = int(np.argmax(exp_utils))
-    utils = obs.features @ true_theta
-    best_u = float(np.max(utils))
-    chosen_u = float(utils[best_idx])
-    return {'regret': best_u - chosen_u, 'purchased': True}
-
-
-# ── Data Collection ──────────────────────────────────────────────────────────
-
-def collect_experiment_data(num_episodes=50, d=8):
-    """Run episodes across seeds and collect all telemetry."""
+def collect_detailed_data(num_episodes=50, d=8):
+    """Run episodes with per-step telemetry for uncertainty/action plots."""
     agent_results = []
-    baseline_results = []
 
     for seed in range(num_episodes):
         rng = np.random.RandomState(seed)
@@ -136,30 +131,27 @@ def collect_experiment_data(num_episodes=50, d=8):
         prior_S0 = np.eye(d) * 0.5
 
         agent_hist = run_detailed_episode(true_theta, DATA_PATH, prior_m0, prior_S0)
-        baseline_stat = run_baseline(true_theta, DATA_PATH, prior_m0, prior_S0)
-
         agent_results.append(agent_hist)
-        baseline_results.append(baseline_stat)
 
-    return agent_results, baseline_results
+    return agent_results
 
 
 # ── Plot Functions ───────────────────────────────────────────────────────────
 
-def plot_regret_comparison(agent_results, baseline_results):
+def plot_regret_comparison(exp_data):
     """Fig 1: Bar chart — average realized regret, agent vs baseline. [Proposal §7]"""
-    agent_regrets = [r['regret'] for r in agent_results if r['purchased'] and r['regret'] is not None]
-    baseline_regrets = [r['regret'] for r in baseline_results if r['purchased']]
+    agent_agg = exp_data['agent_vs_baseline']['agent']['aggregate']
+    baseline_agg = exp_data['agent_vs_baseline']['baseline']['aggregate']
 
-    means = [np.mean(baseline_regrets), np.mean(agent_regrets)]
-    stds = [np.std(baseline_regrets), np.std(agent_regrets)]
+    means = [baseline_agg['avg_realized_regret'], agent_agg['avg_realized_regret']]
+    stds = [baseline_agg['std_realized_regret'], agent_agg['std_realized_regret']]
     labels = ['Baseline\n(Greedy)', 'Our Agent\n(Minimax Regret)']
     colors = ['#d9534f', '#5cb85c']
 
     fig, ax = plt.subplots(figsize=(6, 4))
     bars = ax.bar(labels, means, yerr=stds, capsize=8, color=colors, edgecolor='black', linewidth=0.8)
     ax.set_ylabel('Average Realized Regret', fontsize=12)
-    ax.set_title('Agent vs Baseline: Realized Regret', fontsize=13, fontweight='bold')
+    ax.set_title('Agent vs Baseline: Realized Regret (ε_reg=0.8)', fontsize=13, fontweight='bold')
     ax.set_ylim(bottom=0)
     for bar, m in zip(bars, means):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
@@ -170,16 +162,20 @@ def plot_regret_comparison(agent_results, baseline_results):
     print("  Saved 1_regret_comparison.png")
 
 
-def plot_regret_distribution(agent_results, baseline_results):
+def plot_regret_distribution(exp_data):
     """Fig 2: Histogram — regret distribution for agent vs baseline. [Proposal §7]"""
-    agent_regrets = [r['regret'] for r in agent_results if r['purchased'] and r['regret'] is not None]
-    baseline_regrets = [r['regret'] for r in baseline_results if r['purchased']]
+    agent_results = exp_data['agent_vs_baseline']['agent']['results']
+    baseline_results = exp_data['agent_vs_baseline']['baseline']['results']
+
+    agent_regrets = [r['realized_regret'] for r in agent_results if r['purchased']]
+    baseline_regrets = [r['realized_regret'] for r in baseline_results if r['purchased']]
 
     fig, ax = plt.subplots(figsize=(7, 4))
-    bins = np.linspace(0, max(max(agent_regrets, default=0), max(baseline_regrets, default=0)) + 0.05, 25)
+    max_val = max(max(agent_regrets, default=0), max(baseline_regrets, default=0)) + 0.05
+    bins = np.linspace(0, max_val, 25)
     ax.hist(baseline_regrets, bins=bins, alpha=0.6, label='Baseline (Greedy)', color='#d9534f', edgecolor='black')
     ax.hist(agent_regrets, bins=bins, alpha=0.6, label='Our Agent', color='#5cb85c', edgecolor='black')
-    ax.axvline(x=1.0, color='black', linestyle='--', linewidth=1, label='ε_reg threshold (1.0)')
+    ax.axvline(x=0.8, color='black', linestyle='--', linewidth=1, label='ε_reg threshold (0.8)')
     ax.set_xlabel('Realized Regret', fontsize=12)
     ax.set_ylabel('Number of Episodes', fontsize=12)
     ax.set_title('Regret Distribution Across Episodes', fontsize=13, fontweight='bold')
@@ -190,13 +186,13 @@ def plot_regret_distribution(agent_results, baseline_results):
     print("  Saved 2_regret_distribution.png")
 
 
-def plot_epistemic_uncertainty_decay(agent_results):
+def plot_epistemic_uncertainty_decay(agent_detailed):
     """Fig 3: Line plot — epistemic uncertainty decreasing over steps. [Proposal §4.1, §4.4]"""
     fig, ax = plt.subplots(figsize=(7, 4))
 
     # Plot a few representative episodes
     plotted = 0
-    for i, r in enumerate(agent_results):
+    for i, r in enumerate(agent_detailed):
         if len(r['epistemic_uncertainty']) >= 3:
             steps = list(range(1, len(r['epistemic_uncertainty']) + 1))
             ax.plot(steps, r['epistemic_uncertainty'], alpha=0.3, color='steelblue', linewidth=1)
@@ -205,11 +201,11 @@ def plot_epistemic_uncertainty_decay(agent_results):
             break
 
     # Compute and plot the average trajectory
-    max_len = max(len(r['epistemic_uncertainty']) for r in agent_results if r['epistemic_uncertainty'])
+    max_len = max(len(r['epistemic_uncertainty']) for r in agent_detailed if r['epistemic_uncertainty'])
     avg_unc = []
     for step_idx in range(max_len):
         vals = [r['epistemic_uncertainty'][step_idx]
-                for r in agent_results
+                for r in agent_detailed
                 if len(r['epistemic_uncertainty']) > step_idx]
         if vals:
             avg_unc.append(np.mean(vals))
@@ -227,10 +223,10 @@ def plot_epistemic_uncertainty_decay(agent_results):
     print("  Saved 3_epistemic_uncertainty_decay.png")
 
 
-def plot_action_distribution(agent_results):
+def plot_action_distribution(agent_detailed):
     """Fig 4: Pie chart — distribution of actions taken. [Proposal Algorithm 1]"""
     all_actions = []
-    for r in agent_results:
+    for r in agent_detailed:
         all_actions.extend(r['actions'])
 
     counts = {}
@@ -254,36 +250,36 @@ def plot_action_distribution(agent_results):
     print("  Saved 4_action_distribution.png")
 
 
-def plot_exceedance_comparison(agent_results, baseline_results, threshold=1.0):
-    """Fig 5: Bar chart — regret exceedance rate. [Proposal §7]"""
-    agent_purchased = [r for r in agent_results if r['purchased'] and r['regret'] is not None]
-    baseline_purchased = [r for r in baseline_results if r['purchased']]
-
-    agent_exc = np.mean([1 if r['regret'] > threshold else 0 for r in agent_purchased]) * 100 if agent_purchased else 0
-    baseline_exc = np.mean([1 if r['regret'] > threshold else 0 for r in baseline_purchased]) * 100 if baseline_purchased else 0
-
-    agent_purchase_rate = len(agent_purchased) / len(agent_results) * 100
-    baseline_purchase_rate = len(baseline_purchased) / len(baseline_results) * 100
+def plot_exceedance_comparison(exp_data):
+    """Fig 5: Bar chart — regret exceedance rate & purchase rate. [Proposal §7]"""
+    agent_agg = exp_data['agent_vs_baseline']['agent']['aggregate']
+    baseline_agg = exp_data['agent_vs_baseline']['baseline']['aggregate']
 
     fig, axes = plt.subplots(1, 2, figsize=(10, 4))
+
+    agent_exc = agent_agg['exceedance_rate'] * 100
+    baseline_exc = baseline_agg['exceedance_rate'] * 100
 
     # Exceedance rate
     bars1 = axes[0].bar(['Baseline', 'Our Agent'], [baseline_exc, agent_exc],
                          color=['#d9534f', '#5cb85c'], edgecolor='black')
     axes[0].set_ylabel('Exceedance Rate (%)', fontsize=11)
-    axes[0].set_title(f'Regret Exceedance (threshold={threshold})', fontsize=12, fontweight='bold')
+    axes[0].set_title('Regret Exceedance (ε_reg=0.8)', fontsize=12, fontweight='bold')
     axes[0].set_ylim(0, max(baseline_exc, agent_exc, 10) + 5)
     for bar, val in zip(bars1, [baseline_exc, agent_exc]):
         axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
                      f'{val:.1f}%', ha='center', fontsize=11, fontweight='bold')
 
     # Purchase rate
-    bars2 = axes[1].bar(['Baseline', 'Our Agent'], [baseline_purchase_rate, agent_purchase_rate],
+    agent_pr = agent_agg['purchase_rate'] * 100
+    baseline_pr = baseline_agg['purchase_rate'] * 100
+
+    bars2 = axes[1].bar(['Baseline', 'Our Agent'], [baseline_pr, agent_pr],
                          color=['#d9534f', '#5cb85c'], edgecolor='black')
     axes[1].set_ylabel('Purchase Rate (%)', fontsize=11)
     axes[1].set_title('Purchase Rate', fontsize=12, fontweight='bold')
     axes[1].set_ylim(0, 110)
-    for bar, val in zip(bars2, [baseline_purchase_rate, agent_purchase_rate]):
+    for bar, val in zip(bars2, [baseline_pr, agent_pr]):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                      f'{val:.0f}%', ha='center', fontsize=11, fontweight='bold')
 
@@ -310,14 +306,14 @@ def plot_threshold_sensitivity(d=8, num_episodes=30):
             prior_S0 = np.eye(d) * 0.5
 
             env_config = EnvConfig(data_path=DATA_PATH)
-            engine_config = EngineConfig(eps_reg=1.0, eps_var=eps_epi, tau_util=0.0)
+            engine_config = EngineConfig(eps_reg=0.8, eps_var=eps_epi, tau_util=0.0)
             model_config = ModelConfig(sigma2=0.05)
 
             model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
             engine = DelegationEngine(model, config=engine_config)
             env = StochasticMarket(config=env_config)
 
-            for step in range(20):
+            for step in range(30):
                 obs = env.observe()
                 if obs.features.shape[0] == 0:
                     env.step()
@@ -360,58 +356,184 @@ def plot_threshold_sensitivity(d=8, num_episodes=30):
     lines2, labels2 = ax2.get_legend_handles_labels()
     ax1.legend(lines1 + lines2, labels1 + labels2, loc='center right', fontsize=10)
 
-    ax1.set_title('Sensitivity: Purchase Rate & Regret vs ε_epi Threshold', fontsize=13, fontweight='bold')
+    ax1.set_title('Sensitivity: Purchase Rate & Regret vs ε_epi', fontsize=13, fontweight='bold')
     plt.tight_layout()
     plt.savefig(os.path.join(FIG_DIR, '6_threshold_sensitivity.png'), dpi=150)
     plt.close()
     print("  Saved 6_threshold_sensitivity.png")
 
 
+# ── NEW Plots from Full Experiments ─────────────────────────────────────────
+
+def plot_persona_comparison(exp_data):
+    """Fig 7: Grouped bar chart — regret & purchase rate by persona. [Proposal §6]"""
+    personas = exp_data['personas']
+    names = list(personas.keys())
+
+    agent_regrets = [personas[n]['agent']['aggregate']['avg_realized_regret'] for n in names]
+    baseline_regrets = [personas[n]['baseline']['aggregate']['avg_realized_regret'] for n in names]
+    agent_pr = [personas[n]['agent']['aggregate']['purchase_rate'] * 100 for n in names]
+    baseline_pr = [personas[n]['baseline']['aggregate']['purchase_rate'] * 100 for n in names]
+
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+    x = np.arange(len(names))
+    width = 0.35
+
+    # Regret comparison
+    bars1 = axes[0].bar(x - width/2, baseline_regrets, width, label='Baseline', color='#d9534f', edgecolor='black')
+    bars2 = axes[0].bar(x + width/2, agent_regrets, width, label='Agent', color='#5cb85c', edgecolor='black')
+    axes[0].set_ylabel('Avg Realized Regret', fontsize=12)
+    axes[0].set_title('Regret by Persona', fontsize=13, fontweight='bold')
+    axes[0].set_xticks(x)
+    axes[0].set_xticklabels([n.replace('_', '\n') for n in names], fontsize=10)
+    axes[0].legend()
+    axes[0].set_ylim(bottom=0)
+    for bar, val in zip(bars1, baseline_regrets):
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.001,
+                     f'{val:.3f}', ha='center', fontsize=9)
+    for bar, val in zip(bars2, agent_regrets):
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.001,
+                     f'{val:.3f}', ha='center', fontsize=9)
+
+    # Purchase rate comparison
+    bars3 = axes[1].bar(x - width/2, baseline_pr, width, label='Baseline', color='#d9534f', edgecolor='black')
+    bars4 = axes[1].bar(x + width/2, agent_pr, width, label='Agent', color='#5cb85c', edgecolor='black')
+    axes[1].set_ylabel('Purchase Rate (%)', fontsize=12)
+    axes[1].set_title('Purchase Rate by Persona', fontsize=13, fontweight='bold')
+    axes[1].set_xticks(x)
+    axes[1].set_xticklabels([n.replace('_', '\n') for n in names], fontsize=10)
+    axes[1].legend()
+    axes[1].set_ylim(0, 110)
+    for bar, val in zip(bars3, baseline_pr):
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                     f'{val:.0f}%', ha='center', fontsize=9)
+    for bar, val in zip(bars4, agent_pr):
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                     f'{val:.0f}%', ha='center', fontsize=9)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIG_DIR, '7_persona_comparison.png'), dpi=150)
+    plt.close()
+    print("  Saved 7_persona_comparison.png")
+
+
+def plot_ablation_results(exp_data):
+    """Fig 8: Grouped bar chart — ablation study. [Proposal §7]"""
+    ablations = exp_data['ablations']
+    names = list(ablations.keys())
+    display_names = ['Full Model', 'No Epistemic\nGate', 'No Regret\nGate', 'No Market\nDynamics']
+
+    regrets = [ablations[n]['aggregate']['avg_realized_regret'] for n in names]
+    purchase_rates = [ablations[n]['aggregate']['purchase_rate'] * 100 for n in names]
+    queries = [ablations[n]['aggregate']['avg_queries'] for n in names]
+
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    colors = ['#5cb85c', '#5bc0de', '#f0ad4e', '#d9534f']
+
+    # Regret
+    bars = axes[0].bar(display_names, regrets, color=colors, edgecolor='black')
+    axes[0].set_ylabel('Avg Realized Regret', fontsize=11)
+    axes[0].set_title('Ablation: Regret', fontsize=12, fontweight='bold')
+    axes[0].set_ylim(bottom=0)
+    for bar, val in zip(bars, regrets):
+        axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
+                     f'{val:.3f}', ha='center', fontsize=10, fontweight='bold')
+
+    # Purchase rate
+    bars = axes[1].bar(display_names, purchase_rates, color=colors, edgecolor='black')
+    axes[1].set_ylabel('Purchase Rate (%)', fontsize=11)
+    axes[1].set_title('Ablation: Purchase Rate', fontsize=12, fontweight='bold')
+    axes[1].set_ylim(0, 110)
+    for bar, val in zip(bars, purchase_rates):
+        axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                     f'{val:.0f}%', ha='center', fontsize=10, fontweight='bold')
+
+    # Queries
+    bars = axes[2].bar(display_names, queries, color=colors, edgecolor='black')
+    axes[2].set_ylabel('Avg Queries per Episode', fontsize=11)
+    axes[2].set_title('Ablation: Query Rate', fontsize=12, fontweight='bold')
+    axes[2].set_ylim(bottom=0)
+    for bar, val in zip(bars, queries):
+        axes[2].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1,
+                     f'{val:.1f}', ha='center', fontsize=10, fontweight='bold')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIG_DIR, '8_ablation_results.png'), dpi=150)
+    plt.close()
+    print("  Saved 8_ablation_results.png")
+
+
+def plot_multi_seed_robustness(exp_data):
+    """Fig 9: Bar chart — multi-seed robustness. [Proposal §7]"""
+    seeds = exp_data['multi_seed_robustness']
+    agent_regrets = [s['agent']['avg_realized_regret'] for s in seeds]
+    baseline_regrets = [s['baseline']['avg_realized_regret'] for s in seeds]
+    seed_labels = [f"Seed {s['outer_seed']}" for s in seeds]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    x = np.arange(len(seed_labels))
+    width = 0.35
+
+    bars1 = ax.bar(x - width/2, baseline_regrets, width, label='Baseline', color='#d9534f',
+                   edgecolor='black', alpha=0.8)
+    bars2 = ax.bar(x + width/2, agent_regrets, width, label='Agent', color='#5cb85c',
+                   edgecolor='black', alpha=0.8)
+
+    ax.axhline(y=np.mean(baseline_regrets), color='#d9534f', linestyle='--', linewidth=1.5,
+               label=f'Baseline mean ({np.mean(baseline_regrets):.3f})')
+    ax.axhline(y=np.mean(agent_regrets), color='#5cb85c', linestyle='--', linewidth=1.5,
+               label=f'Agent mean ({np.mean(agent_regrets):.3f})')
+
+    ax.set_ylabel('Avg Realized Regret', fontsize=12)
+    ax.set_title('Multi-Seed Robustness: Agent vs Baseline', fontsize=13, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels(seed_labels, fontsize=10)
+    ax.legend(fontsize=9, loc='upper right')
+    ax.set_ylim(bottom=0)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(FIG_DIR, '9_multi_seed_robustness.png'), dpi=150)
+    plt.close()
+    print("  Saved 9_multi_seed_robustness.png")
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
-    print("Collecting experiment data (50 episodes)...")
-    agent_results, baseline_results = collect_experiment_data(num_episodes=50)
+    print("Loading experiment results from JSON...")
+    exp_data = load_results()
 
-    # Save raw results as JSON
-    def serialize(results):
-        out = []
-        for r in results:
-            entry = dict(r)
-            entry['epistemic_uncertainty'] = list(entry.get('epistemic_uncertainty', []))
-            entry['expected_utility'] = list(entry.get('expected_utility', []))
-            out.append(entry)
-        return out
+    print("Collecting detailed episode data for per-step plots (50 episodes)...")
+    agent_detailed = collect_detailed_data(num_episodes=50)
 
-    with open(os.path.join(RESULTS_DIR, 'agent_results.json'), 'w') as f:
-        json.dump(serialize(agent_results), f, indent=2)
-    with open(os.path.join(RESULTS_DIR, 'baseline_results.json'), 'w') as f:
-        json.dump(serialize(baseline_results), f, indent=2)
-    print(f"Raw results saved to {RESULTS_DIR}/\n")
-
-    print("Generating figures...")
-    plot_regret_comparison(agent_results, baseline_results)
-    plot_regret_distribution(agent_results, baseline_results)
-    plot_epistemic_uncertainty_decay(agent_results)
-    plot_action_distribution(agent_results)
-    plot_exceedance_comparison(agent_results, baseline_results)
+    print("\nGenerating figures...")
+    plot_regret_comparison(exp_data)
+    plot_regret_distribution(exp_data)
+    plot_epistemic_uncertainty_decay(agent_detailed)
+    plot_action_distribution(agent_detailed)
+    plot_exceedance_comparison(exp_data)
 
     print("\nRunning threshold sensitivity analysis (this takes a moment)...")
     plot_threshold_sensitivity()
 
-    print(f"\nAll figures saved to {FIG_DIR}/")
+    print("\nGenerating new experiment figures...")
+    plot_persona_comparison(exp_data)
+    plot_ablation_results(exp_data)
+    plot_multi_seed_robustness(exp_data)
 
-    # Print summary for the record
-    agent_purchased = [r for r in agent_results if r['purchased']]
-    baseline_purchased = [r for r in baseline_results if r['purchased']]
+    print(f"\nAll 9 figures saved to {FIG_DIR}/")
+
+    # Print summary from JSON data
+    agent_agg = exp_data['agent_vs_baseline']['agent']['aggregate']
+    baseline_agg = exp_data['agent_vs_baseline']['baseline']['aggregate']
     print("\n" + "="*50)
-    print("SUMMARY")
+    print("SUMMARY (from full experiment results)")
     print("="*50)
-    print(f"Agent  — purchase rate: {len(agent_purchased)/len(agent_results)*100:.0f}%, "
-          f"avg regret: {np.mean([r['regret'] for r in agent_purchased]):.4f}, "
-          f"avg queries: {np.mean([r['queries'] for r in agent_results]):.1f}")
-    print(f"Baseline — purchase rate: {len(baseline_purchased)/len(baseline_results)*100:.0f}%, "
-          f"avg regret: {np.mean([r['regret'] for r in baseline_purchased]):.4f}")
+    print(f"Agent  — purchase rate: {agent_agg['purchase_rate']*100:.0f}%, "
+          f"avg regret: {agent_agg['avg_realized_regret']:.4f}, "
+          f"avg queries: {agent_agg['avg_queries']:.1f}")
+    print(f"Baseline — purchase rate: {baseline_agg['purchase_rate']*100:.0f}%, "
+          f"avg regret: {baseline_agg['avg_realized_regret']:.4f}")
 
 
 if __name__ == '__main__':
