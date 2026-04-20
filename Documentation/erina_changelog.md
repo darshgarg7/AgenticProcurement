@@ -15,3 +15,14 @@
 - **test_metrics.py**: counter increments, exceedance flag accuracy, default state
 - **test_integration.py**: episode terminates within horizon, baseline episode produces valid output, agent outperforms baseline over multiple seeds
 - All tests mapped to proposal evaluation criteria (Section 7)
+
+### Visualization Script — `experiments/visualize_results.py`
+- Created visualization pipeline that generates 6 figures mapped to Proposal §7
+- **Fig 1** (`1_regret_comparison.png`): Agent vs baseline average realized regret bar chart with std error bars
+- **Fig 2** (`2_regret_distribution.png`): Histogram of regret distribution across episodes, with ε_reg threshold line
+- **Fig 3** (`3_epistemic_uncertainty_decay.png`): Per-step epistemic uncertainty (x⊤Sx) decay showing Bayesian updates working — individual episodes + mean trajectory
+- **Fig 4** (`4_action_distribution.png`): Pie chart of action distribution (QueryUser 45%, Search 22%, Wait 24%, Purchase 9%)
+- **Fig 5** (`5_exceedance_and_purchase_rate.png`): Side-by-side exceedance rate and purchase rate comparison
+- **Fig 6** (`6_threshold_sensitivity.png`): Dual-axis line plot showing purchase rate and avg regret vs ε_epi threshold (sensitivity analysis)
+- Raw results saved as JSON (`results/agent_results.json`, `results/baseline_results.json`)
+- Summary: Agent avg regret 0.094 vs Baseline 0.184, agent purchase rate 74%, 0% exceedance

@@ -1,0 +1,302 @@
+[
+  {
+    "regret": 0.015863389078818013,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.059190775531741624,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.09874859726264001,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.16227777052915304,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.103457095907181,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.1537141017558021,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.5423936687502147,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2453436270849479,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0786920188838301,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2187077871748179,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2542547291933867,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.09686660494708921,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.03429836596969013,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0824685199642749,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.18537574111411187,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.15593946519548108,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.10751640525392958,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2217720625675812,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.41658803665824734,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.04010952947071489,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.4007592467246982,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.8636897708825942,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.3093074091475011,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.5021595855282478,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.09814970576621035,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.23984713663073526,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.01349241621525965,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2862011200557393,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.5207226817119537,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.040027807322130154,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.36831107397564794,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.10741126870272344,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0764522200906862,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.0,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.506172077756875,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.00868199145064158,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.08647529076130711,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.10258621220215514,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.3424808983801317,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.11289424828170837,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.08289559778866451,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.4138482599204886,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.2651100746414082,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  },
+  {
+    "regret": 0.15302152569621175,
+    "purchased": true,
+    "epistemic_uncertainty": [],
+    "expected_utility": []
+  }
+]
