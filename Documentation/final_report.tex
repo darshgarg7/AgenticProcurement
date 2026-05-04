@@ -19,10 +19,15 @@
 \usepackage{makecell}
 
 % ── Metadata ────────────────────────────────────────────────────────────────
-\title{\textbf{Agentic Procurement Under Uncertainty:}\\
+\title{\textbf{Agentic Procurement Under Uncertainty:}\\[0.4em]
        \large Bayesian Delegation with Minimax Regret and Monte Carlo Planning}
-\author{CSCI 5512 --- Artificial Intelligence II\\
-        University of Minnesota}
+\author{%
+  Darsh Garg \quad Erina Karati \quad Muhil Ramesh\\[0.4em]
+  {\normalsize Group 14}\\[0.4em]
+  {\normalsize CSCI 5512 --- Artificial Intelligence II}\\
+  {\normalsize Instructor: Prof.\ Paul Schrater}\\
+  {\normalsize University of Minnesota, Twin Cities}%
+}
 \date{May 2026}
 
 % ── Custom commands ──────────────────────────────────────────────────────────
@@ -41,15 +46,11 @@
 \begin{document}
 
 \maketitle
-\tableofcontents
-\newpage
 
 % ═══════════════════════════════════════════════════════════════════════
 \begin{abstract}
 We design and evaluate a model-based autonomous purchasing agent that operates in a stochastic, partially observable e-commerce environment.  The core scientific question is: \emph{when should an agent autonomously commit to a high-stakes purchase rather than defer to its human principal?}  Our answer rests on three interlocking components: (1)~a Bayesian linear preference model that maintains a full posterior over latent user utility weights $\thetaU \in \mathbb{R}^d$; (2)~a minimax regret gate computed by Monte Carlo sampling from the posterior confidence set; and (3)~a Monte Carlo rollout procedure that estimates the temporal value of waiting under stochastic market dynamics.  We compare the full agent against a baseline that purchases greedily on the first step across 100 episodes per condition.  The agent reduces mean realized regret from $0.170 \pm 0.172$ (baseline) to $0.071 \pm 0.081$ ($p < 10^{-5}$, Welch $t$-test) at the cost of a 50\% purchase rate, reflecting rational abstention under high uncertainty.  A five-seed robustness study confirms stability across random initializations.  Ablations show the minimax regret gate is the most critical component: removing it raises the purchase rate to 98\% and mean regret to $0.168$.  The system is fully reproducible and includes an interactive web demonstration.
 \end{abstract}
-
-\newpage
 
 % ═══════════════════════════════════════════════════════════════════════
 \section{Introduction and Motivation}
