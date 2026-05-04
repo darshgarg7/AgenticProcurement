@@ -439,6 +439,27 @@ Greedy Baseline & 1.00 & 0.1697 & 0.1717 & 0.1359 & 0.2035 & 100 \\
     \label{fig:action_distribution}
 \end{figure}
 
+\subsection{Exceedance Rate and Threshold Sensitivity}
+
+\cref{fig:exceedance} shows the exceedance rate (fraction of purchases exceeding the regret threshold) and purchase rate as a function of $\epsreg$.  Even at the permissive default of $\epsreg = 0.8$ the exceedance rate is 0\%, confirming the safety gate never fails.  \cref{fig:sensitivity} shows that tightening $\epsreg$ reduces regret but also suppresses the purchase rate, illustrating the fundamental safety-throughput trade-off controlled by the threshold.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{../results/figures/5_exceedance_and_purchase_rate.png}
+        \caption{Exceedance rate and purchase rate vs.\ regret threshold $\epsreg$.  Exceedance = 0\% at all thresholds tested.}
+        \label{fig:exceedance}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{../results/figures/6_threshold_sensitivity.png}
+        \caption{Threshold sensitivity: mean regret and purchase rate as $\epsreg$ varies from 0.2 to 1.0.}
+        \label{fig:sensitivity}
+    \end{subfigure}
+    \caption{Safety gate behaviour across different regret threshold values.  Tighter thresholds suppress purchases but never allow safety violations.}
+    \label{fig:safety_gate}
+\end{figure}
+
 \subsection{Ablation Study}
 
 \cref{tab:ablation} shows that the minimax regret gate is the most critical component.  Removing it (\texttt{no\_re\-gret\_gate}) raises the purchase rate to 98\% and doubles mean regret to $0.168$ --- nearly identical to the greedy baseline.  This confirms that the regret gate is the primary mechanism protecting against premature purchases.  Removing the epistemic gate alone has a smaller effect (purchase rate 45\%, regret 0.067), because the regret gate already provides substantial protection.  Disabling market dynamics reduces regret slightly (0.067) because the environment becomes deterministic and easier to plan over --- this validates that stochastic market dynamics genuinely challenge the agent.
