@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agentic Procurement — Delegated Procurement Demo</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ─── TOP NAV ──────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="nav-brand">
+    <span class="brand-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></span>
+    <span class="brand-name">Agentic <span class="brand-ai">Procurement</span></span>
+  </div>
+  <div class="nav-center">
+    <div class="search-bar" id="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search products..." id="search-input" autocomplete="off">
+    </div>
+    <div class="search-dropdown" id="search-dropdown"></div>
+  </div>
+  <div class="nav-right">
+    <div class="cart-icon-wrap" id="cart-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cart-badge">0</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ─── HERO / CONTROLS ──────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-inner">
+    <h1>AI Shopping Agent Demo</h1>
+    <p class="hero-sub">Watch the Bayesian delegation agent browse, evaluate, and purchase products in real-time.</p>
+
+    <div class="controls">
+      <div class="ctrl-group">
+        <label>Persona</label>
+        <select id="persona-select">
+          <option value="balanced" selected>Balanced Shopper</option>
+          <option value="budget_shopper">Budget Shopper</option>
+          <option value="quality_maximizer">Quality Maximizer</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Regret Threshold (ε)</label>
+        <input type="range" id="eps-reg" min="0.1" max="2.0" step="0.1" value="0.8">
+        <span class="range-val" id="eps-reg-val">0.8</span>
+      </div>
+      <div class="ctrl-group">
+        <label>Speed</label>
+        <select id="speed-select">
+          <option value="1500">Slow</option>
+          <option value="800" selected>Normal</option>
+          <option value="300">Fast</option>
+          <option value="100">Instant</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <label>Max Steps</label>
+        <input type="number" id="max-steps-input" min="1" max="100" value="30">
+      </div>
+      <div class="ctrl-group">
+        <label>Seed</label>
+        <input type="number" id="seed-input" min="0" max="99999" value="20">
+      </div>
+      <button class="btn-run" id="run-btn">▶ Start Shopping</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── AGENT STATUS BAR ───────────────────────────────────── -->
+<section class="status-strip" id="status-strip" style="display:none;">
+  <div class="status-inner">
+    <div class="status-step">
+      <span class="status-label">Step</span>
+      <span class="status-value" id="status-step">—</span>
+    </div>
+    <div class="status-action">
+      <span class="status-label">Action</span>
+      <span class="status-value" id="status-action">—</span>
+    </div>
+    <div class="status-reason">
+      <span class="status-label">Reason</span>
+      <span class="status-value" id="status-reason">—</span>
+    </div>
+    <div class="status-unc">
+      <span class="status-label">Uncertainty</span>
+      <span class="status-value" id="status-unc">—</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar" id="progress-bar"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PRODUCT GRID ─────────────────────────────────────────── -->
+<main class="shop-area">
+  <div class="shop-sidebar" id="cart-panel">
+    <h3><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg> Shopping Cart</h3>
+    <div class="cart-items" id="cart-items">
+      <p class="cart-empty">Cart is empty</p>
+    </div>
+    <div class="cart-total" id="cart-total" style="display:none;">
+      <span>Total:</span>
+      <span id="cart-total-price">$0.00</span>
+    </div>
+    <button class="btn-checkout" id="checkout-btn" style="display:none;"><svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Checkout</button>
+
+    <div class="agent-log" id="agent-log">
+      <h3><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> Agent Log</h3>
+      <div class="log-entries" id="log-entries"></div>
+    </div>
+  </div>
+
+  <div class="product-grid" id="product-grid">
+    <div class="grid-placeholder">
+      <p>Click <strong>▶ Start Shopping</strong> to watch the AI agent browse this store.</p>
+    </div>
+  </div>
+</main>
+
+<!-- ─── RESULT OVERLAY ───────────────────────────────────────── -->
+<div class="overlay" id="result-overlay" style="display:none;">
+  <div class="overlay-card">
+    <div class="overlay-icon" id="result-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#067d62" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+    <h2 id="result-title">Purchase Complete!</h2>
+    <div class="result-details" id="result-details"></div>
+    <button class="btn-run" id="close-overlay">View Analysis ↓</button>
+  </div>
+</div>
+
+<!-- ─── POST-SIMULATION ANALYSIS ─────────────────────────────── -->
+<section class="analysis-section" id="analysis-section" style="display:none;">
+  <div class="analysis-inner">
+    <h2 class="analysis-title"><svg class="title-icon" viewBox="0 0 24 24" fill="none" stroke="#ff9900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Episode Analysis</h2>
+
+    <!-- Narrative explanation -->
+    <div class="analysis-card narrative-card" id="narrative-card">
+      <h3><svg class="section-icon accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg> What Happened</h3>
+      <p id="narrative-text"></p>
+    </div>
+
+    <!-- Key metrics row -->
+    <div class="metrics-row" id="metrics-row">
+      <div class="metric-box">
+        <div class="metric-val" id="m-steps">—</div>
+        <div class="metric-label">Steps Taken</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-regret">—</div>
+        <div class="metric-label">Realized Regret</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-queries">—</div>
+        <div class="metric-label">User Queries</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-waits">—</div>
+        <div class="metric-label">Wait Actions</div>
+      </div>
+      <div class="metric-box">
+        <div class="metric-val" id="m-searches">—</div>
+        <div class="metric-label">Searches</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+      <div class="analysis-card chart-card">
+        <h3><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Epistemic Uncertainty Over Time</h3>
+        <p class="chart-desc">Shows how the agent's uncertainty about user preferences decreased as it gathered feedback.</p>
+        <canvas id="unc-chart" width="560" height="260"></canvas>
+      </div>
+      <div class="analysis-card chart-card">
+        <h3><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 118 2.83"/><path d="M22 12A10 10 0 0012 2v10z"/></svg> Action Distribution</h3>
+        <p class="chart-desc">Breakdown of how the agent spent its time during the episode.</p>
+        <canvas id="action-chart" width="300" height="260"></canvas>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="analysis-card timeline-card">
+        <h3><svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Step-by-Step Timeline</h3>
+      <p class="chart-desc">Every action the agent took, with the products it considered and its reasoning.</p>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div style="text-align:center;padding:24px 0;">
+      <button class="btn-run" id="run-again-btn">▶ Run Another Episode</button>
+    </div>
+  </div>
+</section>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
