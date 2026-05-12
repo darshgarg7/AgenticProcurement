@@ -14,7 +14,7 @@
 \usepackage{subcaption}
 \usepackage{natbib}
 \usepackage{enumitem}
-\usepackage{microtype}
+\usepackage[protrusion=true,expansion=false]{microtype}
 \usepackage{float}
 \usepackage{makecell}
 
@@ -310,26 +310,31 @@ python3 web_demo/server.py
 
 \cref{fig:demo_hero,fig:demo_purchase,fig:demo_analysis} show the interactive web demo.  The user can configure the persona, regret threshold $\epsreg$, episode length, and random seed, then watch the agent browse, query, and purchase in real-time.  A post-episode analysis section displays the epistemic uncertainty decay curve, action distribution, and step-by-step timeline.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.82\textwidth]{../results/figures/demo_hero.png}
-    \caption{Web demo control panel.  The user configures the agent's persona, regret threshold $\epsreg$, maximum episode length, and random seed before launching an episode.  The Regret Threshold slider directly controls the minimax-regret safety gate (\cref{alg:delegation}, line 6).}
-    \label{fig:demo_hero}
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{../results/figures/demo_hero.png}
+        \caption{Control panel.  The user sets the persona, regret threshold $\epsreg$, max steps, and seed before launching an episode.  The slider directly controls the minimax-regret safety gate (\cref{alg:delegation}, line 6).}
+        \label{fig:demo_hero}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \includegraphics[width=\textwidth]{../results/figures/demo_purchase.png}
+        \caption{Post-episode purchase overlay.  The agent reports the item, price, realized regret (0.0465), and the number of user queries issued (2), demonstrating preference elicitation before commitment.}
+        \label{fig:demo_purchase}
+    \end{subfigure}
+    \caption{Web demo interface.  Left: configuration panel before episode start.  Right: purchase completion overlay shown immediately after the agent commits to a purchase.}
+    \label{fig:demo_ui}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[t!]
     \centering
-    \includegraphics[width=0.82\textwidth]{../results/figures/demo_purchase.png}
-    \caption{Post-episode purchase result overlay.  The agent reports the purchased item, price, realized regret ($0.0794$), and the number of user queries issued (4), demonstrating that it elicited preference information before committing.}
-    \label{fig:demo_purchase}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.82\textwidth]{../results/figures/demo_analysis.png}
-    \caption{Post-episode analysis section.  The narrative card explains what the agent did and why (epistemic uncertainty dropped 93\%); metric tiles show steps, realized regret, and query count; canvas charts show uncertainty decay and action distribution; the timeline lists every step with uncertainty and expected utility at each decision point.}
+    \includegraphics[width=0.92\textwidth]{../results/figures/demo_analysis.png}
+    \caption{Post-episode analysis section.  The narrative card explains what the agent did and why (epistemic uncertainty dropped 93\%); metric tiles show steps, realized regret, and query count; canvas charts show the uncertainty decay curve and action distribution; the step-by-step timeline lists the epistemic uncertainty and expected utility at every decision point, making the agent's reasoning fully auditable.}
     \label{fig:demo_analysis}
 \end{figure}
+
+The demo is accessible at \texttt{http://127.0.0.1:5001} after running \texttt{python3 web\_demo/server.py}.  It communicates with the same \texttt{DelegationEngine} and \texttt{BayesianPreferenceModel} classes used in the batch experiments, so the behavior observed in the demo is directly comparable to the quantitative results in \cref{sec:results}.  Each episode step is streamed to the browser via a Server-Sent Events endpoint, allowing the user to observe the agent's reasoning in real time, including the minimax regret estimate and epistemic uncertainty at each step.
 
 % ═══════════════════════════════════════════════════════════════════════
 \section{Experimental Setup}
@@ -405,7 +410,7 @@ Greedy Baseline & 1.00 & 0.1697 & 0.1717 & 0.1359 & 0.2035 & 100 \\
 
 \cref{fig:regret_comparison,fig:regret_distribution} illustrate the regret distributions.  The agent's distribution is concentrated near zero, with the long right tail of the baseline absent.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \includegraphics[width=\textwidth]{../results/figures/1_regret_comparison.png}
@@ -426,7 +431,7 @@ Greedy Baseline & 1.00 & 0.1697 & 0.1717 & 0.1359 & 0.2035 & 100 \\
 
 \cref{fig:epistemic_decay} shows that epistemic uncertainty decreases monotonically as queries are issued.  This confirms that the Bayesian update (\cref{eq:bayesian_update}) is functioning correctly: each query reduces $S_t$, which in turn reduces $\sigma_{\mathrm{epi},t}^2(i)$ for candidate items.  The web demo example in \cref{fig:demo_analysis} shows a specific episode where uncertainty dropped from $0.500$ to $0.036$ (93\% reduction) over five steps.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.62\textwidth]{../results/figures/3_epistemic_uncertainty_decay.png}
     \caption{Mean epistemic uncertainty (averaged over surviving items) vs.\ query step.  The shaded band shows $\pm 1$ standard deviation across episodes.  Uncertainty decreases as the Bayesian posterior concentrates after each user query.}
@@ -437,7 +442,7 @@ Greedy Baseline & 1.00 & 0.1697 & 0.1717 & 0.1359 & 0.2035 & 100 \\
 
 \cref{fig:action_distribution} shows the distribution of actions taken across all episodes.  Query and Wait are the two most common non-terminal actions, reflecting the agent's preference for information gathering before purchasing.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.50\textwidth]{../results/figures/4_action_distribution.png}
     \caption{Action distribution across 100 episodes.  The agent issues many \QueryUser{} actions before purchasing, consistent with active inference-style epistemic behavior.}
@@ -448,7 +453,7 @@ Greedy Baseline & 1.00 & 0.1697 & 0.1717 & 0.1359 & 0.2035 & 100 \\
 
 \cref{fig:exceedance} shows the exceedance rate (fraction of purchases exceeding the regret threshold) and purchase rate as a function of $\epsreg$.  Even at the permissive default of $\epsreg = 0.8$ the exceedance rate is 0\%, confirming the safety gate never fails.  \cref{fig:sensitivity} shows that tightening $\epsreg$ reduces regret but also suppresses the purchase rate, illustrating the fundamental safety-throughput trade-off controlled by the threshold.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.48\textwidth}
         \includegraphics[width=\textwidth]{../results/figures/5_exceedance_and_purchase_rate.png}
@@ -487,7 +492,7 @@ No market dynamics & 0.42 & 0.0670 & 0.0804 & 0.333 \\
 
 \cref{fig:ablation} visualizes the ablation results.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.65\textwidth]{../results/figures/8_ablation_results.png}
     \caption{Ablation study results.  Removing the minimax regret gate (\texttt{no\_regret\_gate}) nearly recovers baseline behavior, confirming it is the key component.}
@@ -517,7 +522,7 @@ Balanced         & 0.24 & $0.0652 \pm 0.0717$ & 1.00 & $0.0555 \pm 0.0580$ \\
 
 \cref{fig:persona} shows the grouped bar chart for persona comparisons.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.65\textwidth]{../results/figures/7_persona_comparison.png}
     \caption{Persona comparison.  The agent consistently achieves lower regret than the greedy baseline across all three user personas, at the cost of lower purchase rate due to safety-motivated abstention.}
@@ -549,7 +554,7 @@ Mean $\pm$ Std & $0.492 \pm 0.048$ & $0.0725 \pm 0.0177$ \\
 
 \cref{fig:multi_seed} shows the robustness across seeds.
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=0.62\textwidth]{../results/figures/9_multi_seed_robustness.png}
     \caption{Multi-seed robustness.  Mean realized regret is consistently lower than the greedy baseline (dashed line) across all five seeds, confirming that results are not artifacts of a particular random initialization.}
