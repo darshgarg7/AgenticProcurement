@@ -1,9 +1,17 @@
 import unittest
+from unittest.mock import patch
 
 from web_demo.server import app
 
 
 class TestWebDemoApi(unittest.TestCase):
+    def setUp(self):
+        self.env_patch = patch.dict("os.environ", {"PROCUREMENT_API_KEY": ""})
+        self.env_patch.start()
+
+    def tearDown(self):
+        self.env_patch.stop()
+
     def test_run_episode_post_returns_expected_shape(self):
         client = app.test_client()
         response = client.post(
@@ -42,6 +50,31 @@ class TestWebDemoApi(unittest.TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertIn("error", response.get_json())
+
+    def test_health_and_ready_endpoints_are_public(self):
+        client = app.test_client()
+        with patch.dict("os.environ", {"PROCUREMENT_API_KEY": "secret"}):
+            health = client.get("/healthz")
+            ready = client.get("/readyz")
+
+        self.assertEqual(health.status_code, 200)
+        self.assertEqual(ready.status_code, 200)
+        self.assertEqual(health.get_json()["status"], "ok")
+        self.assertIn("X-Request-ID", health.headers)
+
+    def test_api_key_required_when_configured(self):
+        client = app.test_client()
+        with patch.dict("os.environ", {"PROCUREMENT_API_KEY": "secret"}):
+            unauthenticated = client.post("/api/run-episode", json={"max_steps": 1})
+            authenticated = client.post(
+                "/api/run-episode",
+                headers={"X-API-Key": "secret", "X-Request-ID": "test-request"},
+                json={"max_steps": 1},
+            )
+
+        self.assertEqual(unauthenticated.status_code, 401)
+        self.assertEqual(authenticated.status_code, 200)
+        self.assertEqual(authenticated.headers["X-Request-ID"], "test-request")
 
 
 if __name__ == "__main__":

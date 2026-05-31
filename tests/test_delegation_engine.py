@@ -12,6 +12,7 @@ Validates:
 import unittest
 
 import numpy as np
+from scipy.stats import chi2
 
 from config.settings import EngineConfig, ModelConfig
 from core.interfaces import Observation, Purchase, QueryUser, Search
@@ -129,6 +130,33 @@ class TestWorstCaseRegret(unittest.TestCase):
         regrets = engine.compute_worst_case_regret(X)
         self.assertEqual(np.argmin(regrets), 0,
                          "Best item under tight posterior should have lowest regret")
+
+    def test_ellipsoid_regret_matches_closed_form(self):
+        """Default regret gate should be exact for a finite Gaussian credible set."""
+        d = 1
+        model = BayesianPreferenceModel(d=d, m0=np.array([1.0]), S0=np.array([[0.25]]))
+        config = EngineConfig(confidence_percentile=95.0, regret_method="ellipsoid")
+        engine = DelegationEngine(model, config)
+
+        X = np.array([[0.0], [1.0]])
+        regrets = engine.compute_worst_case_regret(X)
+        expected_first_item_regret = 1.0 + np.sqrt(chi2.ppf(0.95, 1) * 0.25)
+
+        self.assertAlmostEqual(regrets[0], expected_first_item_regret, places=6)
+        self.assertAlmostEqual(regrets[1], 0.0, places=6)
+
+    def test_sampled_regret_mode_remains_available(self):
+        """Experiment parity path should still support posterior sampling."""
+        d = 2
+        model = BayesianPreferenceModel(d=d)
+        config = EngineConfig(num_samples=25, regret_method="sampled")
+        engine = DelegationEngine(model, config, rng=np.random.RandomState(3))
+
+        X = np.array([[1.0, 0.0], [0.0, 1.0]])
+        regrets = engine.compute_worst_case_regret(X)
+
+        self.assertEqual(regrets.shape, (2,))
+        self.assertTrue((regrets >= -1e-10).all())
 
 
 class TestQueryUserLogic(unittest.TestCase):

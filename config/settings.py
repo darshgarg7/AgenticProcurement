@@ -16,6 +16,7 @@ class EngineConfig:
     base_search_ig: float = 0.1
     mc_rollouts: int = 20          # Monte Carlo rollouts for Wait value estimation
     discount_factor: float = 0.95  # temporal discount for Wait rollouts
+    regret_method: str = "ellipsoid"
     confidence_percentile: float = 95.0
     wait_stockout_alpha: float = 0.02
     wait_price_fluctuation: float = 0.05
@@ -29,7 +30,8 @@ class EngineConfig:
         _require_non_negative("base_search_ig", self.base_search_ig)
         _require_positive_int("mc_rollouts", self.mc_rollouts)
         _require_between("discount_factor", self.discount_factor, 0.0, 1.0)
-        _require_between("confidence_percentile", self.confidence_percentile, 0.0, 100.0)
+        _require_in("regret_method", self.regret_method, {"ellipsoid", "sampled"})
+        _require_percentile("confidence_percentile", self.confidence_percentile)
         _require_between("wait_stockout_alpha", self.wait_stockout_alpha, 0.0, 1.0)
         _require_non_negative("wait_price_fluctuation", self.wait_price_fluctuation)
         _require_between("empty_market_value_factor", self.empty_market_value_factor, 0.0, 1.0)
@@ -125,6 +127,17 @@ def _require_between(name: str, value: float, lower: float, upper: float) -> Non
         raise ValueError(f"{name} must be in [{lower}, {upper}], got {value}")
 
 
+def _require_percentile(name: str, value: float) -> None:
+    if not 0.0 <= value < 100.0:
+        raise ValueError(f"{name} must be in [0.0, 100.0), got {value}")
+
+
 def _require_positive_int(name: str, value: int) -> None:
     if not isinstance(value, int) or value <= 0:
         raise ValueError(f"{name} must be a positive integer, got {value}")
+
+
+def _require_in(name: str, value: str, allowed: set[str]) -> None:
+    if value not in allowed:
+        expected = ", ".join(sorted(allowed))
+        raise ValueError(f"{name} must be one of {{{expected}}}, got {value!r}")

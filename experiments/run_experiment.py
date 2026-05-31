@@ -24,7 +24,7 @@ def run_episode(
     rng=None,
 ) -> dict[str, Any]:
     """Run one agent episode with the compact runner defaults."""
-    engine_config = EngineConfig(eps_reg=1.0, eps_var=0.8, tau_util=0.0)
+    engine_config = EngineConfig(eps_reg=2.0, eps_var=0.8, tau_util=0.0)
     stats = run_agent_episode(
         true_theta=true_theta,
         data_path=data_path,
@@ -50,7 +50,7 @@ def run_episode(
 
 def run_baseline_episode(true_theta: npt.NDArray[np.float64], data_path: str, prior_m0: npt.NDArray[np.float64], prior_S0: npt.NDArray[np.float64]) -> dict[str, Any]:
     """Run the greedy first-step baseline for one compact-runner episode."""
-    return run_greedy_baseline_episode(true_theta, data_path, prior_m0, prior_S0, eps_reg=1.0)
+    return run_greedy_baseline_episode(true_theta, data_path, prior_m0, prior_S0, eps_reg=2.0)
 
 def run_experiment(data_path: str, num_episodes: int = 50, d: int = 8) -> None:
     """Run a small agent-vs-baseline experiment and print aggregate metrics."""

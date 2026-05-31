@@ -84,6 +84,16 @@ class IPreferenceModel(ABC):
         """Draw preference-parameter samples."""
         pass
 
+    @abstractmethod
+    def posterior_mean(self) -> npt.NDArray[np.float64]:
+        """Return the current posterior mean vector."""
+        pass
+
+    @abstractmethod
+    def posterior_covariance(self) -> npt.NDArray[np.float64]:
+        """Return the current posterior covariance matrix."""
+        pass
+
 class IMarketEnvironment(ABC):
     """Abstract market environment exposed to the agent."""
 

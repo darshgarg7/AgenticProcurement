@@ -9,7 +9,9 @@ Endpoints:
 """
 
 import os
+import secrets
 import sys
+import uuid
 
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if PROJECT_ROOT not in sys.path:
@@ -21,6 +23,7 @@ import numpy as np
 from flask import (
     Flask,
     Response,
+    g,
     jsonify,
     request,
     send_file,
@@ -34,10 +37,40 @@ from environment.simulator import ProductCatalog
 from web_demo.product_emojis import PRODUCT_EMOJI_MAP
 
 app = Flask(__name__, static_folder='static')
+app.config["MAX_CONTENT_LENGTH"] = int(os.environ.get("PROCUREMENT_MAX_CONTENT_LENGTH", 1_048_576))
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), '..', 'results', 'full_experiment_results.json')
 FIG_DIR = os.path.join(os.path.dirname(__file__), '..', 'results', 'figures')
+API_KEY_ENV = "PROCUREMENT_API_KEY"
+PUBLIC_ENDPOINTS = {"index", "static", "serve_static", "healthz", "readyz"}
+
+
+@app.before_request
+def attach_request_id():
+    """Attach a stable request id for logs and downstream tracing."""
+    g.request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))
+
+
+@app.before_request
+def require_api_key():
+    """Require an API key for API routes when production auth is configured."""
+    expected = os.environ.get(API_KEY_ENV)
+    if not expected or request.endpoint in PUBLIC_ENDPOINTS:
+        return None
+
+    supplied = request.headers.get("X-API-Key") or request.args.get("api_key", "")
+    if not secrets.compare_digest(supplied, expected):
+        return jsonify({"error": "Unauthorized", "request_id": g.request_id}), 401
+    return None
+
+
+@app.after_request
+def add_operational_headers(response):
+    """Expose request metadata useful for production logs and incident triage."""
+    response.headers["X-Request-ID"] = g.get("request_id", str(uuid.uuid4()))
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
 
 # ── Product catalog for display ─────────────────────────────────────────────
 
@@ -116,6 +149,23 @@ RAW_DF = ProductCatalog.from_csv(DATA_PATH)
 def index():
     """Serve the demo shell."""
     return send_from_directory('static', 'index.html')
+
+
+@app.route('/healthz')
+def healthz():
+    """Return a lightweight liveness signal."""
+    return jsonify({"status": "ok", "service": "agentic-procurement"})
+
+
+@app.route('/readyz')
+def readyz():
+    """Return readiness based on required local runtime dependencies."""
+    checks = {
+        "catalog_exists": os.path.exists(DATA_PATH),
+        "catalog_loaded": len(RAW_DF) > 0,
+    }
+    status = 200 if all(checks.values()) else 503
+    return jsonify({"status": "ready" if status == 200 else "not_ready", "checks": checks}), status
 
 
 @app.route('/static/<path:path>')

@@ -45,6 +45,26 @@ class ProductCatalog:
                 records.append(row)
         return cls(records, list(reader.fieldnames))
 
+    @classmethod
+    def from_records(cls, records: list[dict[str, Any]]) -> "ProductCatalog":
+        """Build a catalog from already-decoded numeric records."""
+        if not records:
+            raise ValueError("product catalog must contain at least one item")
+
+        columns = list(records[0].keys())
+        normalized: list[dict[str, float | int]] = []
+        for raw in records:
+            if set(raw.keys()) != set(columns):
+                raise ValueError("all product records must share the same columns")
+            row: dict[str, float | int] = {}
+            for key, value in raw.items():
+                if key == "item_id":
+                    row[key] = int(value)
+                else:
+                    row[key] = float(value)
+            normalized.append(row)
+        return cls(normalized, columns)
+
     def __len__(self) -> int:
         """Return the number of catalog records."""
         return len(self.records)

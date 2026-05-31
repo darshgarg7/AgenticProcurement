@@ -62,6 +62,14 @@ class BayesianPreferenceModel(IPreferenceModel):
         random = np.random if rng is None else rng
         return random.multivariate_normal(self.m, self.S, size=n)
 
+    def posterior_mean(self) -> npt.NDArray[np.float64]:
+        """Return a defensive copy of the posterior mean vector."""
+        return self.m.copy()
+
+    def posterior_covariance(self) -> npt.NDArray[np.float64]:
+        """Return a defensive copy of the posterior covariance matrix."""
+        return self.S.copy()
+
     def _as_feature_vector(self, x: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
         """Validate and coerce one feature vector."""
         vector = np.asarray(x, dtype=np.float64).reshape(-1)

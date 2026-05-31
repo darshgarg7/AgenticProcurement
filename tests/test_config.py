@@ -18,6 +18,10 @@ class TestConfigValidation(unittest.TestCase):
             EngineConfig(num_samples=0)
         with self.assertRaises(ValueError):
             EngineConfig(confidence_percentile=101.0)
+        with self.assertRaises(ValueError):
+            EngineConfig(confidence_percentile=100.0)
+        with self.assertRaises(ValueError):
+            EngineConfig(regret_method="unknown")
 
     def test_invalid_environment_config_raises(self):
         with self.assertRaises(ValueError):

@@ -4,6 +4,7 @@ from typing import Any
 
 import numpy as np
 import numpy.typing as npt
+from scipy.stats import chi2
 
 from config.settings import EngineConfig
 from core.interfaces import (
@@ -32,34 +33,86 @@ class DelegationEngine(IDecisionEngine):
         self.model = model
         self.config = EngineConfig() if config is None else config
         self.rng = np.random if rng is None else rng
-        
+
     def compute_worst_case_regret(self, X: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
-        """Approximate item regret using posterior samples of user preferences."""
+        """Compute item regret under the configured robust-regret method.
+
+        The default ``ellipsoid`` method is exact for a finite catalog and a
+        Gaussian posterior credible ellipsoid. The legacy ``sampled`` method is
+        retained for experiment parity and sensitivity checks.
+        """
         if X.ndim != 2:
             raise ValueError(f"X must be a 2D feature matrix, got shape {X.shape}")
         if X.shape[0] == 0:
             return np.empty((0,), dtype=np.float64)
 
+        if self.config.regret_method == "sampled":
+            return self._compute_sampled_regret(X)
+        return self._compute_ellipsoid_minimax_regret(X)
+
+    def _compute_sampled_regret(self, X: npt.NDArray[np.float64]) -> npt.NDArray[np.float64]:
+        """Approximate item regret using posterior samples of user preferences."""
         thetas = self.model.sample_theta(self.config.num_samples, rng=self.rng) # (N, d)
-        
+
         U = thetas @ X.T # (N, M)
         max_U = np.max(U, axis=1, keepdims=True) # (N, 1)
         regret = max_U - U # (N, M)
-        
+
         return np.percentile(regret, self.config.confidence_percentile, axis=0) # (M,)
+
+    def _compute_ellipsoid_minimax_regret(
+        self,
+        X: npt.NDArray[np.float64],
+    ) -> npt.NDArray[np.float64]:
+        """Compute exact finite-catalog minimax regret over a credible ellipsoid.
+
+        For posterior mean ``m`` and covariance ``S``, the confidence set is
+        ``{theta: (theta - m)^T S^-1 (theta - m) <= beta}``, where ``beta`` is
+        the chi-square quantile for the configured confidence level. For a
+        chosen item ``i`` and competing item ``j``, the maximum regret over that
+        ellipsoid has the support-function form:
+
+        ``m^T(x_j - x_i) + sqrt(beta) * sqrt((x_j - x_i)^T S (x_j - x_i))``.
+
+        Taking the maximum over all competitors gives the exact robust regret
+        for the current finite catalog snapshot.
+        """
+        mean = self.model.posterior_mean()
+        covariance = self.model.posterior_covariance()
+        if mean.shape != (X.shape[1],):
+            raise ValueError(
+                f"posterior mean must have shape ({X.shape[1]},), got {mean.shape}"
+            )
+        if covariance.shape != (X.shape[1], X.shape[1]):
+            raise ValueError(
+                "posterior covariance must have shape "
+                f"({X.shape[1]}, {X.shape[1]}), got {covariance.shape}"
+            )
+
+        confidence = self.config.confidence_percentile / 100.0
+        beta = float(chi2.ppf(confidence, df=X.shape[1]))
+        if not np.isfinite(beta):
+            raise ValueError("confidence_percentile produced a non-finite credible radius")
+
+        deltas = X[None, :, :] - X[:, None, :]
+        mean_terms = deltas @ mean
+        variance_terms = np.einsum("ijd,dk,ijk->ij", deltas, covariance, deltas)
+        uncertainty_terms = np.sqrt(beta * np.maximum(variance_terms, 0.0))
+        regrets = mean_terms + uncertainty_terms
+        return np.maximum(np.max(regrets, axis=1), 0.0)
 
     def estimate_wait_value(self, obs: Observation) -> float:
         """Estimate the one-step value of Wait via Monte Carlo rollouts.
-        
+
         Simulates future price/availability transitions and computes
         the expected best utility after waiting. [Proposal §4.2, Algorithm 1]
         """
         if obs.features.shape[0] == 0:
             return -float('inf')
-        
+
         current_best = float(np.max(self.model.expected_utility(obs.features)))
         future_values = []
-        
+
         for _ in range(self.config.mc_rollouts):
             n_items = obs.features.shape[0]
             survive_mask = self.rng.uniform(size=n_items) > self.config.wait_stockout_alpha
@@ -77,10 +130,10 @@ class DelegationEngine(IDecisionEngine):
             norms = np.linalg.norm(future_features, axis=1, keepdims=True)
             norms[norms == 0] = 1.0
             future_features = future_features / norms
-            
+
             future_utils = self.model.expected_utility(future_features)
             future_values.append(float(np.max(future_utils)))
-        
+
         discounted_future = self.config.discount_factor * np.mean(future_values)
         return discounted_future
 
@@ -94,9 +147,9 @@ class DelegationEngine(IDecisionEngine):
                 worst_case_regrets=np.empty((0,), dtype=np.float64),
                 best_idx=None,
             )
-        
+
         X = obs.features
-            
+
         expected_utils = self.model.expected_utility(X) # (M,)
         epistemic_uncs = self.model.epistemic_uncertainty(X) # (M,)
         worst_regrets = self.compute_worst_case_regret(X) # (M,)
@@ -134,15 +187,15 @@ class DelegationEngine(IDecisionEngine):
                 print(f"  epistemic_uncertainty={epistemic_uncs[i]:.2f}")
                 print(f"  estimated_worst_case_regret={worst_regrets[i]:.2f}")
             print("")
-            
+
         # 3. Let i* = argmax expected utility
         best_idx = diagnostics.best_idx
         best_id = obs.item_ids[best_idx]
-        
+
         mu_star = expected_utils[best_idx]
         reg_star = worst_regrets[best_idx]
         var_star = epistemic_uncs[best_idx]
-        
+
         action = None
         # 4. If mu >= tau_util, R <= eps_reg, and var <= eps_var -> Purchase
         if mu_star >= self.config.tau_util and reg_star <= self.config.eps_reg and var_star <= self.config.eps_var:
@@ -154,7 +207,7 @@ class DelegationEngine(IDecisionEngine):
             sigma2 = getattr(self.model, 'sigma2', 0.05)
             ig_query = 0.5 * np.log(1 + var_star / sigma2)
             ig_search = self.config.base_search_ig
-            
+
             # 6. Estimate Wait value via MC rollouts [Proposal Algorithm 1]
             wait_value = self.estimate_wait_value(obs)
             current_value = float(mu_star)
@@ -178,7 +231,7 @@ class DelegationEngine(IDecisionEngine):
                 action = Search()
                 if verbose:
                     print("Decision: Search\n")
-                    
+
         return action, diagnostics
 
     def decide(self, obs: Observation, verbose: bool = False) -> Action:
