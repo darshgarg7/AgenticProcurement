@@ -574,4 +574,4 @@ perception and learning. *Journal of Mathematical Psychology*,
 Ryan Smith, Thomas Parr, and Karl J. Friston. A step-by-step tutorial on
 active inference and its application to empirical data. *Journal of
 Mathematical Psychology*, 107:102632, 2022.
-::::
+:::
