@@ -36,7 +36,8 @@ from core.episode import make_episode_context, step_agent_episode
 from environment.simulator import ProductCatalog
 from web_demo.product_emojis import PRODUCT_EMOJI_MAP
 
-app = Flask(__name__, static_folder='static')
+static_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+app = Flask(__name__, static_folder=static_dir)
 app.config["MAX_CONTENT_LENGTH"] = int(os.environ.get("PROCUREMENT_MAX_CONTENT_LENGTH", 1_048_576))
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
@@ -148,7 +149,7 @@ RAW_DF = ProductCatalog.from_csv(DATA_PATH)
 @app.route('/')
 def index():
     """Serve the demo shell."""
-    return send_from_directory('static', 'index.html')
+    return send_from_directory(app.static_folder, 'index.html')
 
 
 @app.route('/healthz')
@@ -171,7 +172,7 @@ def readyz():
 @app.route('/static/<path:path>')
 def serve_static(path):
     """Serve static demo assets."""
-    return send_from_directory('static', path)
+    return send_from_directory(app.static_folder, path)
 
 
 # ── API: Search products ─────────────────────────────────────────────────────
