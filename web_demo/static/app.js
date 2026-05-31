@@ -202,6 +202,44 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// ─── Episode API: prefer SSE, fall back to POST ─────────────
+function requestEpisode(params) {
+  if (!window.EventSource) {
+    return fetchEpisode(params);
+  }
+
+  return new Promise((resolve, reject) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => query.set(key, value));
+    const source = new EventSource(`/api/run-episode-stream?${query.toString()}`);
+    let settled = false;
+
+    source.addEventListener('complete', (event) => {
+      settled = true;
+      source.close();
+      resolve(JSON.parse(event.data));
+    });
+
+    source.addEventListener('error', () => {
+      source.close();
+      if (settled) return;
+      fetchEpisode(params).then(resolve).catch(reject);
+    });
+  });
+}
+
+async function fetchEpisode(params) {
+  const resp = await fetch('/api/run-episode', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  if (!resp.ok) {
+    throw new Error(`Episode request failed (${resp.status})`);
+  }
+  return resp.json();
+}
+
 // ─── Reset UI ──────────────────────────────────────────────
 function resetUI() {
   productGrid.innerHTML = '<div class="grid-placeholder"><p>Click <strong>▶ Start Shopping</strong> to watch the AI agent browse this store.</p></div>';
@@ -236,12 +274,7 @@ async function runEpisode() {
   const speed = parseInt(speedSelect.value);
 
   try {
-    const resp = await fetch('/api/run-episode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-    const data = await resp.json();
+    const data = await requestEpisode(params);
 
     statusStrip.style.display = 'block';
     productGrid.innerHTML = '';

@@ -9,13 +9,13 @@ Validates:
   - Results can be serialized to JSON for the final report          [Report requirement]
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 import json
-import numpy as np
+import os
 import unittest
-from experiments.run_experiment import run_episode, run_baseline_episode
+
+import numpy as np
+
+from experiments.run_experiment import run_baseline_episode, run_episode
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
 

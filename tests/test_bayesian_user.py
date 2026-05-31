@@ -8,13 +8,12 @@ Validates:
   - sample_theta draws are distributed around the posterior mean          [Proposal §4.3]
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import unittest
 
 import numpy as np
-import unittest
-from models.bayesian_user import BayesianPreferenceModel
+
 from config.settings import ModelConfig
+from models.bayesian_user import BayesianPreferenceModel
 
 
 class TestBayesianPrior(unittest.TestCase):

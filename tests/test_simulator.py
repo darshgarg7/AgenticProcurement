@@ -8,13 +8,13 @@ Validates:
   - Edge case: empty market after all items stocked out  [Robustness]
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import unittest
 
 import numpy as np
-import unittest
-from environment.simulator import StochasticMarket
+
 from config.settings import EnvConfig
+from environment.simulator import StochasticMarket
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
 
@@ -59,7 +59,6 @@ class TestStockOutDynamics(unittest.TestCase):
         """Over many steps, fraction of items lost per step ≈ alpha."""
         alpha = 0.05
         env = StochasticMarket(config=EnvConfig(data_path=DATA_PATH, alpha=alpha))
-        initial_count = len(env.available_indices)
 
         total_removed = 0
         total_at_risk = 0

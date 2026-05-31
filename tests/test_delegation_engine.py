@@ -9,15 +9,14 @@ Validates:
   - Search/Wait fallback when IG is low                                        [Proposal Algorithm 1]
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import unittest
 
 import numpy as np
-import unittest
+
+from config.settings import EngineConfig, ModelConfig
+from core.interfaces import Observation, Purchase, QueryUser, Search
 from decision.delegation_engine import DelegationEngine
 from models.bayesian_user import BayesianPreferenceModel
-from core.interfaces import Observation, Purchase, QueryUser, Search, Wait
-from config.settings import EngineConfig, ModelConfig
 
 
 def make_obs(features, item_ids=None):

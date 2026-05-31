@@ -9,15 +9,15 @@ Validates:
   - Full experiment runner runs without errors                       [Integration]
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import unittest
 
 import numpy as np
-import unittest
-from config.settings import PersonaConfig, EngineConfig, EnvConfig, ModelConfig
-from models.bayesian_user import BayesianPreferenceModel
+
+from config.settings import EngineConfig, ModelConfig, PersonaConfig
+from core.interfaces import Observation
 from decision.delegation_engine import DelegationEngine
-from core.interfaces import Observation, Purchase, QueryUser, Search, Wait
+from models.bayesian_user import BayesianPreferenceModel
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
 
@@ -142,7 +142,7 @@ class TestPersonaExperimentSmoke(unittest.TestCase):
     """Smoke test that persona experiments produce valid output."""
 
     def test_persona_episode_runs(self):
-        from experiments.run_full_experiments import run_episode, run_baseline_episode
+        from experiments.run_full_experiments import run_baseline_episode, run_episode
         for factory in [PersonaConfig.budget_shopper, PersonaConfig.quality_maximizer, PersonaConfig.balanced]:
             persona = factory(d=8, seed=0)
             engine_config = EngineConfig(eps_reg=0.3, eps_var=0.8, tau_util=0.0)

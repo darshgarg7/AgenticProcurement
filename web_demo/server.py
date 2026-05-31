@@ -8,19 +8,29 @@ Endpoints:
   POST /api/run-episode    → runs a live episode, returns step-by-step data with product info
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import os
+import sys
+
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
 import json
-import numpy as np
-import pandas as pd
-from flask import Flask, jsonify, request, send_from_directory, send_file
 
-from environment.simulator import StochasticMarket
-from decision.delegation_engine import DelegationEngine
-from models.bayesian_user import BayesianPreferenceModel
-from core.interfaces import Purchase, QueryUser, Wait, Search
-from config.settings import EngineConfig, EnvConfig, ModelConfig, PersonaConfig
+import numpy as np
+from flask import (
+    Flask,
+    Response,
+    jsonify,
+    request,
+    send_file,
+    send_from_directory,
+    stream_with_context,
+)
+
+from config.settings import EngineConfig, EnvConfig, PersonaConfig
+from core.episode import make_episode_context, step_agent_episode
+from environment.simulator import ProductCatalog
 from web_demo.product_emojis import PRODUCT_EMOJI_MAP
 
 app = Flask(__name__, static_folder='static')
@@ -82,36 +92,35 @@ def get_product_info(item_id, price_norm, rating_norm, quality_norm, cat_idx):
     }
 
 
-def items_from_obs(obs, raw_df):
-    """Build product info list from an Observation."""
-    products = []
-    for i, item_id in enumerate(obs.item_ids):
-        row = raw_df.loc[raw_df['item_id'] == item_id].iloc[0]
-        cat_idx = 0
-        for c in range(5):
-            if row[f'cat_{c}'] == 1.0:
-                cat_idx = c
-                break
-        products.append(get_product_info(
-            item_id, row['price_norm'], row['rating_norm'], row['quality_norm'], cat_idx
-        ))
-    return products
+def product_from_item_id(item_id, catalog):
+    """Build demo product metadata for one catalog item."""
+    row = catalog.row_by_item_id(item_id)
+    cat_idx = 0
+    for c in range(5):
+        if row[f'cat_{c}'] == 1.0:
+            cat_idx = c
+            break
+    return get_product_info(
+        item_id, row['price_norm'], row['rating_norm'], row['quality_norm'], cat_idx
+    )
 
 
 # ── Load raw product data ───────────────────────────────────────────────────
 
-RAW_DF = pd.read_csv(DATA_PATH)
+RAW_DF = ProductCatalog.from_csv(DATA_PATH)
 
 
 # ── Pages ───────────────────────────────────────────────────────────────────
 
 @app.route('/')
 def index():
+    """Serve the demo shell."""
     return send_from_directory('static', 'index.html')
 
 
 @app.route('/static/<path:path>')
 def serve_static(path):
+    """Serve static demo assets."""
     return send_from_directory('static', path)
 
 
@@ -119,11 +128,12 @@ def serve_static(path):
 
 @app.route('/api/search')
 def search_products():
+    """Return up to 12 product-display records matching a query."""
     q = request.args.get('q', '').strip().lower()
     if len(q) < 1:
         return jsonify([])
     results = []
-    for _, row in RAW_DF.iterrows():
+    for row in RAW_DF.records:
         cat_idx = 0
         for c in range(5):
             if row[f'cat_{c}'] == 1.0:
@@ -144,15 +154,17 @@ def search_products():
 
 @app.route('/api/results')
 def get_results():
+    """Return precomputed experiment results for the dashboard."""
     if not os.path.exists(RESULTS_PATH):
         return jsonify({'error': 'No experiment results found'}), 404
-    with open(RESULTS_PATH, 'r') as f:
+    with open(RESULTS_PATH) as f:
         data = json.load(f)
     return jsonify(data)
 
 
 @app.route('/api/figures/<name>')
 def get_figure(name):
+    """Serve a generated experiment figure by file name."""
     if not name.endswith('.png'):
         return jsonify({'error': 'Invalid file type'}), 400
     safe_name = os.path.basename(name)
@@ -164,27 +176,34 @@ def get_figure(name):
 
 # ── API: Run live episode ───────────────────────────────────────────────────
 
-@app.route('/api/run-episode', methods=['POST'])
-def run_episode():
-    body = request.get_json(force=True)
-    persona_choice = body.get('persona', 'balanced')
-    eps_reg = float(body.get('eps_reg', 0.8))
-    eps_var = float(body.get('eps_var', 0.8))
-    max_steps = int(body.get('max_steps', 30))
-    seed = int(body.get('seed', 42))
+def _episode_params(values):
+    """Parse, validate, and clamp episode request parameters."""
+    try:
+        persona_choice = values.get('persona', 'balanced')
+        eps_reg = float(values.get('eps_reg', 0.8))
+        eps_var = float(values.get('eps_var', eps_reg))
+        max_steps = int(values.get('max_steps', 30))
+        seed = int(values.get('seed', 42))
+    except (TypeError, ValueError) as exc:
+        raise ValueError("Invalid episode parameter") from exc
 
-    # Clamp
-    eps_reg = max(0.1, min(eps_reg, 5.0))
-    eps_var = max(0.1, min(eps_var, 5.0))
-    max_steps = max(1, min(max_steps, 100))
-    seed = max(0, min(seed, 99999))
+    return {
+        'persona': persona_choice,
+        'eps_reg': max(0.1, min(eps_reg, 5.0)),
+        'eps_var': max(0.1, min(eps_var, 5.0)),
+        'max_steps': max(1, min(max_steps, 100)),
+        'seed': max(0, min(seed, 99999)),
+    }
 
+
+def _initialize_episode(params):
+    """Create a seeded episode context from request parameters."""
     d = 8
-    rng = np.random.RandomState(seed)
+    rng = np.random.RandomState(params['seed'])
 
-    if persona_choice in ('budget_shopper', 'quality_maximizer', 'balanced'):
-        factory = getattr(PersonaConfig, persona_choice)
-        persona = factory(d=d, seed=seed)
+    if params['persona'] in ('budget_shopper', 'quality_maximizer', 'balanced'):
+        factory = getattr(PersonaConfig, params['persona'])
+        persona = factory(d=d, seed=params['seed'])
         true_theta = persona.true_theta
         prior_m0 = persona.prior_mean
         prior_S0 = persona.prior_cov
@@ -194,112 +213,132 @@ def run_episode():
         prior_m0 = true_theta + rng.normal(0, 0.4, d)
         prior_S0 = np.eye(d) * 0.5
 
-    engine_config = EngineConfig(eps_reg=eps_reg, eps_var=eps_var, tau_util=0.0)
-    model_config = ModelConfig(sigma2=0.05)
-    model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
-    engine = DelegationEngine(model, config=engine_config)
-    env = StochasticMarket(config=EnvConfig(data_path=DATA_PATH))
+    engine_config = EngineConfig(
+        eps_reg=params['eps_reg'],
+        eps_var=params['eps_var'],
+        tau_util=0.0,
+    )
+    return make_episode_context(
+        true_theta=true_theta,
+        data_path=DATA_PATH,
+        prior_m0=prior_m0,
+        prior_S0=prior_S0,
+        engine_config=engine_config,
+        env_config=EnvConfig(data_path=DATA_PATH),
+        rng=rng,
+    )
 
+
+def _round_or_none(value, digits=4):
+    """Round numeric values while preserving nulls for JSON output."""
+    return None if value is None else round(float(value), digits)
+
+
+def iter_episode_events(params):
+    """Yield step and completion events for one live demo episode."""
+    context = _initialize_episode(params)
     steps = []
     epi_unc_history = []
     action_counts = {"Purchase": 0, "QueryUser": 0, "Wait": 0, "Search": 0}
-    outcome = {"purchased": False, "steps": max_steps}
+    outcome = {"purchased": False, "steps": params['max_steps']}
 
-    for step in range(max_steps):
-        obs = env.observe()
+    for step_index in range(params['max_steps']):
+        step = step_agent_episode(context, step_index, top_k=5)
+        step_payload = _demo_payload_from_step(step, context.env.items)
+        steps.append(step_payload)
+        action_counts[step.action] += 1
+        if step.epi_unc is not None:
+            epi_unc_history.append(float(step.epi_unc))
+        yield "step", step_payload
 
-        if obs.features.shape[0] == 0:
-            steps.append({
-                "step": step + 1, "action": "Search",
-                "reason": "No items available — searching for new products",
-                "epi_unc": None, "exp_util": None,
-                "products": [], "target_item": None,
-            })
-            action_counts["Search"] += 1
-            env.step()
-            continue
-
-        products = items_from_obs(obs, RAW_DF)
-        epi_unc = model.epistemic_uncertainty(obs.features)
-        exp_util = model.expected_utility(obs.features)
-        best_idx = int(np.argmax(exp_util))
-        epi_unc_history.append(float(epi_unc[best_idx]))
-
-        # Top-5 products by expected utility for display
-        top_indices = np.argsort(-exp_util)[:5]
-        top_products = [products[i] for i in top_indices]
-
-        action = engine.decide(obs)
-
-        if isinstance(action, Purchase):
-            idx = obs.item_ids.index(action.item_id)
-            utils = obs.features @ true_theta
-            best_u = float(np.max(utils))
-            chosen_u = float(utils[idx])
-            realized_regret = best_u - chosen_u
-            target = products[idx]
-
-            steps.append({
-                "step": step + 1, "action": "Purchase",
-                "reason": f"Purchased {target['name']}",
-                "epi_unc": round(float(epi_unc[best_idx]), 4),
-                "exp_util": round(float(exp_util[best_idx]), 4),
-                "products": top_products, "target_item": target,
-            })
-            action_counts["Purchase"] += 1
+        if step.action == "Purchase":
+            target = step_payload["target_item"]
             outcome = {
                 "purchased": True,
                 "item": target,
-                "realized_regret": round(realized_regret, 4),
-                "steps": step + 1,
+                "realized_regret": _round_or_none(step.realized_regret),
+                "estimated_wc_regret": _round_or_none(step.estimated_wc_regret),
+                "steps": step.step,
             }
             break
+    else:
+        outcome = {"purchased": False, "steps": len(steps)}
 
-        elif isinstance(action, QueryUser):
-            idx = obs.item_ids.index(action.item_id)
-            x = obs.features[idx]
-            y = float(true_theta @ x) + np.random.normal(0, np.sqrt(model_config.sigma2))
-            model.update(x, y)
-            target = products[idx]
-
-            steps.append({
-                "step": step + 1, "action": "QueryUser",
-                "reason": f"Asking user about {target['name']}",
-                "epi_unc": round(float(epi_unc[best_idx]), 4),
-                "exp_util": round(float(exp_util[best_idx]), 4),
-                "products": top_products, "target_item": target,
-            })
-            action_counts["QueryUser"] += 1
-
-        elif isinstance(action, Wait):
-            env.step()
-            steps.append({
-                "step": step + 1, "action": "Wait",
-                "reason": "Waiting for better deals",
-                "epi_unc": round(float(epi_unc[best_idx]), 4),
-                "exp_util": round(float(exp_util[best_idx]), 4),
-                "products": top_products, "target_item": None,
-            })
-            action_counts["Wait"] += 1
-
-        else:
-            env.step()
-            steps.append({
-                "step": step + 1, "action": "Search",
-                "reason": "Browsing for more options",
-                "epi_unc": round(float(epi_unc[best_idx]), 4),
-                "exp_util": round(float(exp_util[best_idx]), 4),
-                "products": top_products, "target_item": None,
-            })
-            action_counts["Search"] += 1
-
-    return jsonify({
+    yield "complete", {
         "outcome": outcome,
         "steps": steps,
         "epi_unc_history": epi_unc_history,
         "action_counts": action_counts,
-    })
+    }
+
+
+def _demo_payload_from_step(step, catalog):
+    """Convert an internal episode step into the browser payload shape."""
+    top_products = [product_from_item_id(item_id, catalog) for item_id in step.top_item_ids]
+    target = product_from_item_id(step.item_id, catalog) if step.item_id is not None else None
+    reason = _reason_for_step(step, target)
+    return {
+        "step": step.step,
+        "action": step.action,
+        "reason": reason,
+        "epi_unc": _round_or_none(step.epi_unc),
+        "exp_util": _round_or_none(step.exp_util),
+        "estimated_wc_regret": _round_or_none(step.estimated_wc_regret),
+        "products": top_products,
+        "target_item": target,
+    }
+
+
+def _reason_for_step(step, target):
+    """Create a concise user-facing explanation for a demo step."""
+    if step.action == "Purchase":
+        name = target["name"] if target else "selected item"
+        return f"Purchased {name} (est. regret={step.estimated_wc_regret:.3f})"
+    if step.action == "QueryUser":
+        name = target["name"] if target else "selected item"
+        return f"Asking user about {name}"
+    if step.action == "Wait":
+        if step.wait_advantage is None:
+            return "Waiting for better deals"
+        return f"Waiting for better deals (wait advantage={step.wait_advantage:.3f})"
+    return "No items available — searching for new products" if not step.top_item_ids else "Browsing for more options"
+
+
+@app.route('/api/run-episode', methods=['POST'])
+def run_episode():
+    """Run an episode eagerly and return the full JSON transcript."""
+    try:
+        params = _episode_params(request.get_json(force=True))
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+    payload = None
+    for event_name, event_payload in iter_episode_events(params):
+        if event_name == "complete":
+            payload = event_payload
+    return jsonify(payload)
+
+
+@app.route('/api/run-episode-stream')
+def run_episode_stream():
+    """Stream an episode as Server-Sent Events."""
+    try:
+        params = _episode_params(request.args)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    @stream_with_context
+    def generate():
+        for event_name, event_payload in iter_episode_events(params):
+            yield f"event: {event_name}\n"
+            yield f"data: {json.dumps(event_payload)}\n\n"
+
+    return Response(
+        generate(),
+        mimetype='text/event-stream',
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    debug = os.environ.get("FLASK_DEBUG", "").lower() in {"1", "true", "yes"}
+    app.run(debug=debug, port=5001)

@@ -5,22 +5,23 @@ Tab 1: Live Shopping Agent — step through a procurement episode interactively
 Tab 2: Research Dashboard — view experiment results and figures
 """
 
-import sys, os
-sys.path.insert(0, os.path.dirname(__file__))
-
 import json
+import os
+from dataclasses import replace
+
+import matplotlib
 import numpy as np
 import pandas as pd
 import streamlit as st
-import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from environment.simulator import StochasticMarket
-from decision.delegation_engine import DelegationEngine
-from models.bayesian_user import BayesianPreferenceModel
-from core.interfaces import Purchase, QueryUser, Wait, Search
 from config.settings import EngineConfig, EnvConfig, ModelConfig, PersonaConfig
+from core.interfaces import Purchase, QueryUser, Wait
+from decision.delegation_engine import DelegationEngine
+from environment.simulator import StochasticMarket
+from models.bayesian_user import BayesianPreferenceModel
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), 'data', 'products.csv')
 RESULTS_PATH = os.path.join(os.path.dirname(__file__), 'results', 'full_experiment_results.json')
@@ -88,10 +89,16 @@ with tab1:
 
         # Initialize
         engine_config = EngineConfig(eps_reg=eps_reg, eps_var=eps_var, tau_util=0.0)
+        env_config = EnvConfig(data_path=DATA_PATH)
+        engine_config = replace(
+            engine_config,
+            wait_stockout_alpha=env_config.alpha,
+            wait_price_fluctuation=env_config.price_fluctuation,
+        )
         model_config = ModelConfig(sigma2=0.05)
         model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
-        engine = DelegationEngine(model, config=engine_config)
-        env = StochasticMarket(config=EnvConfig(data_path=DATA_PATH))
+        engine = DelegationEngine(model, config=engine_config, rng=rng)
+        env = StochasticMarket(config=env_config, rng=rng)
 
         # Run episode
         step_log = []
@@ -142,7 +149,7 @@ with tab1:
             elif isinstance(action, QueryUser):
                 idx = obs.item_ids.index(action.item_id)
                 x = obs.features[idx]
-                y = float(true_theta @ x) + np.random.normal(0, np.sqrt(model_config.sigma2))
+                y = float(true_theta @ x) + rng.normal(0, np.sqrt(model_config.sigma2))
                 model.update(x, y)
                 step_log.append({
                     "Step": step + 1, "Action": "❓ QueryUser",
@@ -218,7 +225,7 @@ with tab1:
                 color_map = {'Purchase': '#5cb85c', 'QueryUser': '#5bc0de',
                              'Search': '#f0ad4e', 'Wait': '#d9534f'}
                 fig2, ax2 = plt.subplots(figsize=(6, 3.5))
-                colors = [color_map.get(k, '#999') for k in used_actions.keys()]
+                colors = [color_map.get(k, '#999') for k in used_actions]
                 ax2.bar(used_actions.keys(), used_actions.values(), color=colors, edgecolor='black')
                 ax2.set_ylabel('Count')
                 ax2.set_title('Actions Taken This Episode')
@@ -240,7 +247,7 @@ with tab2:
 
     # ── Load results ────────────────────────────────────────────────────
     if os.path.exists(RESULTS_PATH):
-        with open(RESULTS_PATH, 'r') as f:
+        with open(RESULTS_PATH) as f:
             exp_data = json.load(f)
 
         # ── Key metrics ────────────────────────────────────────────────

@@ -15,22 +15,21 @@ Reads results/full_experiment_results.json and generates:
 All figures saved to results/figures/.
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-import numpy as np
 import json
+import os
+
 import matplotlib
+import numpy as np
+
 matplotlib.use('Agg')  # non-interactive backend
 import matplotlib.pyplot as plt
 
-from environment.simulator import StochasticMarket
-from decision.delegation_engine import DelegationEngine
-from models.bayesian_user import BayesianPreferenceModel
-from evaluation.metrics import MetricsTracker
-from core.interfaces import Purchase, QueryUser, Wait, Search
 from config.settings import EngineConfig, EnvConfig, ModelConfig
-from experiments.run_full_experiments import run_episode as run_agent_episode, run_baseline_episode
+from core.interfaces import Purchase, QueryUser, Wait
+from decision.delegation_engine import DelegationEngine
+from environment.simulator import StochasticMarket
+from evaluation.metrics import MetricsTracker
+from models.bayesian_user import BayesianPreferenceModel
 
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'results')
 FIG_DIR = os.path.join(RESULTS_DIR, 'figures')
@@ -43,22 +42,23 @@ os.makedirs(FIG_DIR, exist_ok=True)
 
 def load_results():
     path = os.path.join(RESULTS_DIR, 'full_experiment_results.json')
-    with open(path, 'r') as f:
+    with open(path) as f:
         return json.load(f)
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
-def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=30):
+def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=30, rng=None):
     """Run one episode and return per-step telemetry."""
     d = len(true_theta)
+    random = np.random if rng is None else rng
     env_config = EnvConfig(data_path=data_path)
     engine_config = EngineConfig(eps_reg=0.8, eps_var=0.8, tau_util=0.0)
     model_config = ModelConfig(sigma2=0.05)
 
     model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
-    engine = DelegationEngine(model, config=engine_config)
-    env = StochasticMarket(config=env_config)
+    engine = DelegationEngine(model, config=engine_config, rng=random)
+    env = StochasticMarket(config=env_config, rng=random)
     tracker = MetricsTracker()
 
     history = {
@@ -101,7 +101,7 @@ def run_detailed_episode(true_theta, data_path, prior_m0, prior_S0, max_steps=30
         elif isinstance(action, QueryUser):
             idx = obs.item_ids.index(action.item_id)
             x = obs.features[idx]
-            y = float(true_theta @ x) + np.random.normal(0, np.sqrt(model_config.sigma2))
+            y = float(true_theta @ x) + random.normal(0, np.sqrt(model_config.sigma2))
             model.update(x, y)
             tracker.record_query()
             history['actions'].append('QueryUser')
@@ -130,7 +130,7 @@ def collect_detailed_data(num_episodes=50, d=8):
         prior_m0 = true_theta + rng.normal(0, 0.4, d)
         prior_S0 = np.eye(d) * 0.5
 
-        agent_hist = run_detailed_episode(true_theta, DATA_PATH, prior_m0, prior_S0)
+        agent_hist = run_detailed_episode(true_theta, DATA_PATH, prior_m0, prior_S0, rng=rng)
         agent_results.append(agent_hist)
 
     return agent_results
@@ -153,7 +153,7 @@ def plot_regret_comparison(exp_data):
     ax.set_ylabel('Average Realized Regret', fontsize=12)
     ax.set_title('Agent vs Baseline: Realized Regret (ε_reg=0.8)', fontsize=13, fontweight='bold')
     ax.set_ylim(bottom=0)
-    for bar, m in zip(bars, means):
+    for bar, m in zip(bars, means, strict=False):
         ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
                 f'{m:.3f}', ha='center', va='bottom', fontsize=11, fontweight='bold')
     plt.tight_layout()
@@ -192,7 +192,7 @@ def plot_epistemic_uncertainty_decay(agent_detailed):
 
     # Plot a few representative episodes
     plotted = 0
-    for i, r in enumerate(agent_detailed):
+    for r in agent_detailed:
         if len(r['epistemic_uncertainty']) >= 3:
             steps = list(range(1, len(r['epistemic_uncertainty']) + 1))
             ax.plot(steps, r['epistemic_uncertainty'], alpha=0.3, color='steelblue', linewidth=1)
@@ -236,7 +236,7 @@ def plot_action_distribution(agent_detailed):
     labels = list(counts.keys())
     sizes = list(counts.values())
     color_map = {'Purchase': '#5cb85c', 'QueryUser': '#5bc0de', 'Search': '#f0ad4e', 'Wait': '#d9534f'}
-    colors = [color_map.get(l, '#999999') for l in labels]
+    colors = [color_map.get(label, '#999999') for label in labels]
 
     fig, ax = plt.subplots(figsize=(6, 5))
     wedges, texts, autotexts = ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%',
@@ -266,7 +266,7 @@ def plot_exceedance_comparison(exp_data):
     axes[0].set_ylabel('Exceedance Rate (%)', fontsize=11)
     axes[0].set_title('Regret Exceedance (ε_reg=0.8)', fontsize=12, fontweight='bold')
     axes[0].set_ylim(0, max(baseline_exc, agent_exc, 10) + 5)
-    for bar, val in zip(bars1, [baseline_exc, agent_exc]):
+    for bar, val in zip(bars1, [baseline_exc, agent_exc], strict=False):
         axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
                      f'{val:.1f}%', ha='center', fontsize=11, fontweight='bold')
 
@@ -279,7 +279,7 @@ def plot_exceedance_comparison(exp_data):
     axes[1].set_ylabel('Purchase Rate (%)', fontsize=11)
     axes[1].set_title('Purchase Rate', fontsize=12, fontweight='bold')
     axes[1].set_ylim(0, 110)
-    for bar, val in zip(bars2, [baseline_pr, agent_pr]):
+    for bar, val in zip(bars2, [baseline_pr, agent_pr], strict=False):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                      f'{val:.0f}%', ha='center', fontsize=11, fontweight='bold')
 
@@ -313,7 +313,7 @@ def plot_threshold_sensitivity(d=8, num_episodes=30):
             engine = DelegationEngine(model, config=engine_config)
             env = StochasticMarket(config=env_config)
 
-            for step in range(30):
+            for _step in range(30):
                 obs = env.observe()
                 if obs.features.shape[0] == 0:
                     env.step()
@@ -388,10 +388,10 @@ def plot_persona_comparison(exp_data):
     axes[0].set_xticklabels([n.replace('_', '\n') for n in names], fontsize=10)
     axes[0].legend()
     axes[0].set_ylim(bottom=0)
-    for bar, val in zip(bars1, baseline_regrets):
+    for bar, val in zip(bars1, baseline_regrets, strict=False):
         axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.001,
                      f'{val:.3f}', ha='center', fontsize=9)
-    for bar, val in zip(bars2, agent_regrets):
+    for bar, val in zip(bars2, agent_regrets, strict=False):
         axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.001,
                      f'{val:.3f}', ha='center', fontsize=9)
 
@@ -404,10 +404,10 @@ def plot_persona_comparison(exp_data):
     axes[1].set_xticklabels([n.replace('_', '\n') for n in names], fontsize=10)
     axes[1].legend()
     axes[1].set_ylim(0, 110)
-    for bar, val in zip(bars3, baseline_pr):
+    for bar, val in zip(bars3, baseline_pr, strict=False):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                      f'{val:.0f}%', ha='center', fontsize=9)
-    for bar, val in zip(bars4, agent_pr):
+    for bar, val in zip(bars4, agent_pr, strict=False):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                      f'{val:.0f}%', ha='center', fontsize=9)
 
@@ -435,7 +435,7 @@ def plot_ablation_results(exp_data):
     axes[0].set_ylabel('Avg Realized Regret', fontsize=11)
     axes[0].set_title('Ablation: Regret', fontsize=12, fontweight='bold')
     axes[0].set_ylim(bottom=0)
-    for bar, val in zip(bars, regrets):
+    for bar, val in zip(bars, regrets, strict=False):
         axes[0].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.002,
                      f'{val:.3f}', ha='center', fontsize=10, fontweight='bold')
 
@@ -444,7 +444,7 @@ def plot_ablation_results(exp_data):
     axes[1].set_ylabel('Purchase Rate (%)', fontsize=11)
     axes[1].set_title('Ablation: Purchase Rate', fontsize=12, fontweight='bold')
     axes[1].set_ylim(0, 110)
-    for bar, val in zip(bars, purchase_rates):
+    for bar, val in zip(bars, purchase_rates, strict=False):
         axes[1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
                      f'{val:.0f}%', ha='center', fontsize=10, fontweight='bold')
 
@@ -453,7 +453,7 @@ def plot_ablation_results(exp_data):
     axes[2].set_ylabel('Avg Queries per Episode', fontsize=11)
     axes[2].set_title('Ablation: Query Rate', fontsize=12, fontweight='bold')
     axes[2].set_ylim(bottom=0)
-    for bar, val in zip(bars, queries):
+    for bar, val in zip(bars, queries, strict=False):
         axes[2].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1,
                      f'{val:.1f}', ha='center', fontsize=10, fontweight='bold')
 
@@ -474,10 +474,10 @@ def plot_multi_seed_robustness(exp_data):
     x = np.arange(len(seed_labels))
     width = 0.35
 
-    bars1 = ax.bar(x - width/2, baseline_regrets, width, label='Baseline', color='#d9534f',
-                   edgecolor='black', alpha=0.8)
-    bars2 = ax.bar(x + width/2, agent_regrets, width, label='Agent', color='#5cb85c',
-                   edgecolor='black', alpha=0.8)
+    ax.bar(x - width/2, baseline_regrets, width, label='Baseline', color='#d9534f',
+           edgecolor='black', alpha=0.8)
+    ax.bar(x + width/2, agent_regrets, width, label='Agent', color='#5cb85c',
+           edgecolor='black', alpha=0.8)
 
     ax.axhline(y=np.mean(baseline_regrets), color='#d9534f', linestyle='--', linewidth=1.5,
                label=f'Baseline mean ({np.mean(baseline_regrets):.3f})')

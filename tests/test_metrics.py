@@ -8,10 +8,8 @@ Validates:
   - get_stats returns correct dictionary
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 import unittest
+
 from evaluation.metrics import MetricsTracker
 
 

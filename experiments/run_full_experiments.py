@@ -13,19 +13,15 @@ Runs:
 All results saved to results/ as JSON.
 """
 
-import sys, os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
 import json
-import numpy as np
-from typing import Dict, Any, List
+import os
+from typing import Any
 
-from environment.simulator import StochasticMarket
-from decision.delegation_engine import DelegationEngine
-from models.bayesian_user import BayesianPreferenceModel
-from evaluation.metrics import MetricsTracker
-from core.interfaces import Purchase, QueryUser, Wait, Search
-from config.settings import EngineConfig, EnvConfig, ModelConfig, PersonaConfig
+import numpy as np
+
+from config.settings import EngineConfig, EnvConfig, PersonaConfig
+from core.episode import run_agent_episode
+from core.episode import run_baseline_episode as run_greedy_baseline_episode
 
 DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'products.csv')
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), '..', 'results')
@@ -36,123 +32,37 @@ os.makedirs(RESULTS_DIR, exist_ok=True)
 
 def run_episode(true_theta, data_path, prior_m0, prior_S0,
                 engine_config=None, env_config=None, model_config=None,
-                max_steps=20) -> Dict[str, Any]:
-    d = len(true_theta)
-    if engine_config is None:
-        engine_config = EngineConfig(eps_reg=0.8, eps_var=0.8, tau_util=0.0)
-    if env_config is None:
-        env_config = EnvConfig(data_path=data_path)
-    if model_config is None:
-        model_config = ModelConfig(sigma2=0.05)
-
-    model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0, config=model_config)
-    engine = DelegationEngine(model, config=engine_config)
-    env = StochasticMarket(config=env_config)
-    tracker = MetricsTracker()
-
-    step_data = []
-
-    for step in range(max_steps):
-        obs = env.observe()
-        if obs.features.shape[0] == 0:
-            env.step()
-            tracker.record_delay()
-            step_data.append({'step': step, 'action': 'Search', 'epi_unc': None, 'exp_util': None})
-            continue
-
-        epi_unc = model.epistemic_uncertainty(obs.features)
-        exp_util = model.expected_utility(obs.features)
-        best_idx = int(np.argmax(exp_util))
-
-        action = engine.decide(obs)
-
-        if isinstance(action, Purchase):
-            idx = obs.item_ids.index(action.item_id)
-            utils = obs.features @ true_theta
-            best_u = float(np.max(utils))
-            chosen_u = float(utils[idx])
-            realized_reg = best_u - chosen_u
-
-            worst_regs = engine.compute_worst_case_regret(obs.features)
-            estimated_wc_reg = float(worst_regs[idx])
-
-            tracker.record_purchase(realized_regret=realized_reg,
-                                    estimated_wc_regret=estimated_wc_reg,
-                                    threshold=engine_config.eps_reg)
-
-            step_data.append({
-                'step': step, 'action': 'Purchase',
-                'epi_unc': float(epi_unc[best_idx]),
-                'exp_util': float(exp_util[best_idx]),
-            })
-            break
-
-        elif isinstance(action, QueryUser):
-            idx = obs.item_ids.index(action.item_id)
-            x = obs.features[idx]
-            y = float(true_theta @ x) + np.random.normal(0, np.sqrt(model_config.sigma2))
-            model.update(x, y)
-            tracker.record_query()
-            step_data.append({
-                'step': step, 'action': 'QueryUser',
-                'epi_unc': float(epi_unc[best_idx]),
-                'exp_util': float(exp_util[best_idx]),
-            })
-
-        elif isinstance(action, Wait):
-            tracker.record_delay()
-            env.step()
-            step_data.append({
-                'step': step, 'action': 'Wait',
-                'epi_unc': float(epi_unc[best_idx]),
-                'exp_util': float(exp_util[best_idx]),
-            })
-
-        else:  # Search
-            tracker.record_delay()
-            env.step()
-            step_data.append({
-                'step': step, 'action': 'Search',
-                'epi_unc': float(epi_unc[best_idx]),
-                'exp_util': float(exp_util[best_idx]),
-            })
-
-    stats = tracker.get_stats()
-    stats['steps_taken'] = len(step_data)
-    stats['step_data'] = step_data
-    return stats
+                max_steps=20, rng=None) -> dict[str, Any]:
+    """Run one full-suite agent episode through the shared episode service."""
+    return run_agent_episode(
+        true_theta=true_theta,
+        data_path=data_path,
+        prior_m0=prior_m0,
+        prior_S0=prior_S0,
+        engine_config=engine_config,
+        env_config=env_config,
+        model_config=model_config,
+        max_steps=max_steps,
+        rng=rng,
+    )
 
 
 def run_baseline_episode(true_theta, data_path, prior_m0, prior_S0,
-                         eps_reg=0.3) -> Dict[str, Any]:
-    d = len(true_theta)
-    model = BayesianPreferenceModel(d=d, m0=prior_m0, S0=prior_S0)
-    env = StochasticMarket(config=EnvConfig(data_path=data_path))
-    obs = env.observe()
-
-    if obs.features.shape[0] == 0:
-        return {'purchased': False, 'queries': 0, 'delays': 0,
-                'realized_regret': 0.0, 'estimated_worst_case_regret': 0.0,
-                'exceeded_regret': False}
-
-    exp_utils = model.expected_utility(obs.features)
-    best_idx = int(np.argmax(exp_utils))
-    utils = obs.features @ true_theta
-    best_u = float(np.max(utils))
-    chosen_u = float(utils[best_idx])
-    realized_reg = best_u - chosen_u
-
-    return {
-        'queries': 0, 'delays': 0, 'purchased': True,
-        'realized_regret': realized_reg,
-        'estimated_worst_case_regret': 0.0,
-        'exceeded_regret': realized_reg > eps_reg
-    }
+                         eps_reg=0.3) -> dict[str, Any]:
+    """Run one greedy baseline episode through the shared episode service."""
+    return run_greedy_baseline_episode(
+        true_theta=true_theta,
+        data_path=data_path,
+        prior_m0=prior_m0,
+        prior_S0=prior_S0,
+        eps_reg=eps_reg,
+    )
 
 
 # ── Aggregation helper ──────────────────────────────────────────────────────
 
-def aggregate(results: List[Dict]) -> Dict[str, float]:
+def aggregate(results: list[dict]) -> dict[str, float]:
+    """Aggregate raw episode dictionaries into report metrics."""
     purchases = [r for r in results if r['purchased']]
     return {
         'num_episodes': len(results),
@@ -170,6 +80,7 @@ def aggregate(results: List[Dict]) -> Dict[str, float]:
 # ── Experiment 1: Agent vs Baseline (tightened threshold) ───────────────────
 
 def experiment_agent_vs_baseline(num_episodes=100, d=8, eps_reg=0.3):
+    """Compare the full agent against the greedy baseline."""
     print(f"\n{'='*60}")
     print(f"EXPERIMENT 1: Agent vs Baseline (eps_reg={eps_reg}, {num_episodes} episodes)")
     print(f"{'='*60}")
@@ -188,7 +99,7 @@ def experiment_agent_vs_baseline(num_episodes=100, d=8, eps_reg=0.3):
 
         agent_stats = run_episode(true_theta, DATA_PATH, prior_m0, prior_S0,
                                   engine_config=engine_config,
-                                  max_steps=30)
+                                  max_steps=30, rng=rng)
         baseline_stats = run_baseline_episode(true_theta, DATA_PATH, prior_m0, prior_S0,
                                               eps_reg=eps_reg)
 
@@ -216,6 +127,7 @@ def experiment_agent_vs_baseline(num_episodes=100, d=8, eps_reg=0.3):
 # ── Experiment 2: Persona experiments ───────────────────────────────────────
 
 def experiment_personas(num_episodes_per_persona=100, d=8, eps_reg=0.3):
+    """Evaluate the agent and baseline across synthetic personas."""
     print(f"\n{'='*60}")
     print(f"EXPERIMENT 2: Persona Experiments ({num_episodes_per_persona} episodes each)")
     print(f"{'='*60}")
@@ -234,12 +146,13 @@ def experiment_personas(num_episodes_per_persona=100, d=8, eps_reg=0.3):
 
         for seed in range(num_episodes_per_persona):
             persona = factory(d=d, seed=seed)
+            rng = np.random.RandomState(seed)
 
             engine_config = EngineConfig(eps_reg=eps_reg, eps_var=0.8, tau_util=0.0)
 
             agent_stats = run_episode(persona.true_theta, DATA_PATH,
                                       persona.prior_mean, persona.prior_cov,
-                                      engine_config=engine_config, max_steps=30)
+                                      engine_config=engine_config, max_steps=30, rng=rng)
             baseline_stats = run_baseline_episode(persona.true_theta, DATA_PATH,
                                                   persona.prior_mean, persona.prior_cov,
                                                   eps_reg=eps_reg)
@@ -269,6 +182,7 @@ def experiment_personas(num_episodes_per_persona=100, d=8, eps_reg=0.3):
 # ── Experiment 3: Ablation studies ──────────────────────────────────────────
 
 def experiment_ablations(num_episodes=100, d=8, eps_reg=0.3):
+    """Run ablations that disable individual safety or market components."""
     print(f"\n{'='*60}")
     print(f"EXPERIMENT 3: Ablation Studies ({num_episodes} episodes each)")
     print(f"{'='*60}")
@@ -305,7 +219,7 @@ def experiment_ablations(num_episodes=100, d=8, eps_reg=0.3):
 
             stats = run_episode(true_theta, DATA_PATH, prior_m0, prior_S0,
                                 engine_config=cfg['engine_config'],
-                                env_config=cfg['env_config'], max_steps=30)
+                                env_config=cfg['env_config'], max_steps=30, rng=rng)
             results.append(stats)
 
         agg = aggregate(results)
@@ -323,6 +237,7 @@ def experiment_ablations(num_episodes=100, d=8, eps_reg=0.3):
 # ── Experiment 4: Multi-seed robustness ─────────────────────────────────────
 
 def experiment_multi_seed_robustness(num_outer_seeds=5, num_episodes=50, d=8, eps_reg=0.3):
+    """Measure aggregate stability across independent outer seeds."""
     print(f"\n{'='*60}")
     print(f"EXPERIMENT 4: Multi-Seed Robustness ({num_outer_seeds} seeds x {num_episodes} episodes)")
     print(f"{'='*60}")
@@ -344,7 +259,7 @@ def experiment_multi_seed_robustness(num_outer_seeds=5, num_episodes=50, d=8, ep
             engine_config = EngineConfig(eps_reg=eps_reg, eps_var=0.8, tau_util=0.0)
 
             agent_stats = run_episode(true_theta, DATA_PATH, prior_m0, prior_S0,
-                                      engine_config=engine_config, max_steps=30)
+                                      engine_config=engine_config, max_steps=30, rng=rng)
             baseline_stats = run_baseline_episode(true_theta, DATA_PATH, prior_m0, prior_S0,
                                                   eps_reg=eps_reg)
             agent_results.append(agent_stats)
@@ -390,6 +305,7 @@ def strip_step_data(results_dict):
 
 
 def main():
+    """Run every experiment and save the aggregate JSON artifact."""
     all_results = {}
 
     # Experiment 1
