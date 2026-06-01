@@ -47,6 +47,116 @@ the horizon $T$ is reached. In the latter case, abstention is modeled
 implicitly as ending the episode without purchase when no action
 satisfies the safety criterion.
 
+```mermaid
+flowchart TB
+    Browser["Browser User<br/>Interactive Procurement Demo"]
+    CLI["Research / Batch Runner<br/>Experiment + Offline Evaluation CLI"]
+
+    subgraph Service["Service Boundary"]
+        Static["web_demo/static<br/>Demo UI"]
+        Flask["web_demo/server.py<br/>Flask API<br/>REST + SSE Streaming<br/>API Key Auth<br/>Request IDs<br/>Health / Readiness"]
+        WSGI["wsgi.py + Dockerfile<br/>Deployable Web Entrypoint"]
+    end
+
+    subgraph Orchestration["Shared Runtime Core"]
+        Episode["core/episode.py<br/>Canonical Episode Loop<br/>Single Source of Agent Behavior"]
+        Interfaces["core/interfaces.py<br/>Observation, Actions,<br/>Model / Engine / Environment Contracts"]
+    end
+
+    subgraph DecisionSystem["Decision System"]
+        Engine["decision/delegation_engine.py<br/>DelegationEngine"]
+        Gate["Purchase Safety Gate<br/>Utility Threshold<br/>Epistemic Variance Threshold<br/>Worst-Case Regret Threshold"]
+        Regret["Robust Regret Estimator<br/>Default: Exact Finite-Catalog<br/>Ellipsoidal Minimax Regret<br/>Fallback: Sampled Percentile Regret"]
+        WaitValue["Monte Carlo Wait Valuation<br/>Stockout + Price Dynamics Rollouts"]
+    end
+
+    subgraph BeliefSystem["Preference Belief System"]
+        Model["models/bayesian_user.py<br/>Bayesian Linear Preference Model"]
+        Posterior["Posterior State<br/>Mean Vector m<br/>Covariance Matrix S"]
+        Update["Bayesian Update<br/>User Feedback / Query Signal"]
+    end
+
+    subgraph MarketSystem["Market + Catalog System"]
+        Env["environment/simulator.py<br/>StochasticMarket"]
+        Catalog["ProductCatalog<br/>Validated Numeric Catalog"]
+        Products["data/products.csv<br/>500 Product Candidates"]
+        Sources["environment/catalog_sources.py<br/>CSV / JSON Catalog Ingestion"]
+    end
+
+    subgraph Evaluation["Evaluation Surfaces"]
+        Synthetic["experiments/run_full_experiments.py<br/>Synthetic Agent vs Baseline<br/>Personas, Ablations, Multi-Seed"]
+        Offline["evaluation/offline.py<br/>Logged Procurement Replay<br/>Real-Data Evaluation Path"]
+        OfflineCLI["experiments/run_offline_evaluation.py<br/>Offline Replay CLI"]
+        Metrics["evaluation/metrics.py<br/>Episode Metrics<br/>Regret, Purchase, Query, Delay"]
+        Artifacts["results/*.json<br/>results/figures/*.png"]
+    end
+
+    subgraph Quality["Engineering Quality Gates"]
+        Tests["tests/<br/>75 Unit + Integration Tests"]
+        Make["Makefile<br/>make quality"]
+        Ruff["Ruff Lint"]
+        Pytest["Pytest"]
+        Compile["compileall"]
+        CI[".github/workflows/ci.yml<br/>Automated Verification"]
+    end
+
+    Browser --> Static
+    Static --> Flask
+    WSGI --> Flask
+    Flask --> Episode
+
+    CLI --> Synthetic
+    CLI --> OfflineCLI
+    Synthetic --> Episode
+    OfflineCLI --> Offline
+
+    Episode --> Interfaces
+    Episode --> Engine
+    Episode --> Env
+    Episode --> Metrics
+
+    Engine --> Gate
+    Gate --> Regret
+    Gate --> WaitValue
+    Engine --> Model
+
+    Model --> Posterior
+    Update --> Model
+    Episode -->|QueryUser| Update
+
+    Env --> Catalog
+    Catalog --> Products
+    Sources --> Catalog
+
+    Episode -->|Wait / Search| Env
+    Episode -->|Purchase| Metrics
+    Offline --> Engine
+    Offline --> Model
+    Offline --> Metrics
+
+    Synthetic --> Artifacts
+    Metrics --> Artifacts
+
+    Make --> Ruff
+    Make --> Pytest
+    Make --> Compile
+    Pytest --> Tests
+    CI --> Make
+
+    classDef service fill:#e8f1ff,stroke:#2f5f98,stroke-width:1px,color:#102033;
+    classDef core fill:#eef8f1,stroke:#2f7d4f,stroke-width:1px,color:#102015;
+    classDef decision fill:#fff4df,stroke:#9a6a12,stroke-width:1px,color:#30220a;
+    classDef eval fill:#f3ebff,stroke:#6b45a0,stroke-width:1px,color:#221233;
+    classDef quality fill:#ffecec,stroke:#a04444,stroke-width:1px,color:#331111;
+
+    class Static,Flask,WSGI service;
+    class Episode,Interfaces,Model,Posterior,Update,Env,Catalog,Products,Sources core;
+    class Engine,Gate,Regret,WaitValue decision;
+    class Synthetic,Offline,OfflineCLI,Metrics,Artifacts eval;
+    class Tests,Make,Ruff,Pytest,Compile,CI quality;
+
+```
+
 ## Action Space and Environment
 
 The action set is
