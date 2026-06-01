@@ -24,9 +24,23 @@
     <div class="search-dropdown" id="search-dropdown"></div>
   </div>
   <div class="nav-right">
-    <div class="cart-icon-wrap" id="cart-btn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-      <span class="cart-badge" id="cart-badge">0</span>
+    <div class="cart-wrapper" id="cart-wrapper">
+      <div class="cart-icon-wrap" id="cart-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="cart-badge" id="cart-badge">0</span>
+      </div>
+      <div class="cart-nav-dropdown" id="cart-nav-dropdown">
+        <div class="cnd-header">
+          <span class="cnd-title">Cart</span>
+          <span class="cnd-close" id="cnd-close">✕</span>
+        </div>
+        <div class="cnd-items" id="cnd-items">
+          <p class="cnd-empty">Your cart is empty</p>
+        </div>
+        <div class="cnd-footer" id="cnd-footer" style="display:none">
+          <div class="cnd-total">Total: <strong id="cnd-total-price">$0.00</strong></div>
+        </div>
+      </div>
     </div>
   </div>
 </nav>

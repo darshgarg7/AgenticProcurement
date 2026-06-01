@@ -69,7 +69,9 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#eaeded;c
 .search-empty{padding:20px;text-align:center;color:#888;font-size:.85rem}
 
 .nav-right{display:flex;align-items:center;gap:16px;flex-shrink:0;position:relative;z-index:2}
-.cart-icon-wrap{position:relative;cursor:pointer}
+.cart-wrapper{position:relative}
+.cart-icon-wrap{position:relative;cursor:pointer;padding:4px;border-radius:6px;transition:background .15s}
+.cart-icon-wrap:hover{background:rgba(255,255,255,.1)}
 .cart-icon-wrap svg{width:26px;height:26px;color:#fff}
 .cart-badge{
   position:absolute;top:-6px;right:-8px;
@@ -77,6 +79,53 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#eaeded;c
   width:18px;height:18px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
 }
+
+/* ─── Cart Nav Dropdown ──────────────────────────────────── */
+.cart-nav-dropdown{
+  display:none;position:absolute;top:calc(100% + 12px);right:0;
+  width:300px;background:#fff;border-radius:8px;
+  box-shadow:0 8px 32px rgba(0,0,0,.22);border:1px solid #d5d9d9;
+  z-index:2000;animation:cardAppear .2s ease;
+}
+.cart-nav-dropdown.open{display:block}
+.cnd-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;border-bottom:1px solid #eee;
+}
+.cnd-title{font-size:.95rem;font-weight:700;color:#0f1111}
+.cnd-close{
+  cursor:pointer;color:#888;font-size:.9rem;line-height:1;
+  padding:2px 6px;border-radius:4px;transition:background .1s;
+}
+.cnd-close:hover{background:#f0f0f0;color:#333}
+.cnd-items{max-height:320px;overflow-y:auto;padding:8px 0}
+.cnd-empty{color:#aaa;font-size:.83rem;text-align:center;padding:20px 0}
+.cnd-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 16px;border-bottom:1px solid #f5f5f5;
+  animation:slideInLeft .3s ease;
+}
+.cnd-item:last-child{border-bottom:none}
+.cnd-item-icon{
+  width:40px;height:40px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;flex-shrink:0;background:#f7f8fa;
+}
+.cnd-item-info{flex:1;min-width:0}
+.cnd-item-name{font-size:.82rem;font-weight:600;color:#0f1111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cnd-item-meta{font-size:.75rem;color:#565959;margin-top:2px}
+.cnd-item-price{font-size:.88rem;font-weight:700;color:#b12704;flex-shrink:0}
+.cnd-item-badge{
+  display:inline-block;margin-top:3px;padding:2px 6px;
+  border-radius:3px;font-size:.65rem;font-weight:700;
+  background:#e6f7ef;color:#067d62;
+}
+.cnd-footer{
+  padding:12px 16px;border-top:2px solid #232f3e;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.cnd-total{font-size:.9rem;color:#0f1111}
+.cnd-total strong{color:#0f1111;margin-left:4px}
 
 /* ─── Hero / Controls ────────────────────────────────────── */
 .hero{
