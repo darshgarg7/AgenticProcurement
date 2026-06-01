@@ -372,54 +372,6 @@ with a live web environment proves too time-consuming, the static
 simulator will still fully support the proposed stochastic modeling,
 Bayesian updates, Monte Carlo evaluation, and baseline comparisons.
 
-# Implementation Plan and Timeline
-
-We assume a three-person team, with work being organized around modular
-components.
-
-## Roles
-
--   **Member 1**: Implement the Bayesian user preference model,
-    posterior updates, and confidence set construction.
-
--   **Member 2**: Implement the stochastic stock-out and price dynamics,
-    simulator logic, and feature processing from the CSV catalog.
-
--   **Member 3**: Implement the minimax-regret approximation, delegation
-    engine, experiment pipeline, and evaluation scripts.
-
-## Timeline
-
-#### Weeks 1--2: Foundations.
-
-Finalize the problem specification and metrics. Implement a prototype
-Bayesian user model and generate synthetic personas. Load a toy CSV
-dataset and basic feature extraction.
-
-#### Week 3: Environment Stochasticity.
-
-Implement the stock-out and price dynamics, environment step function,
-and item sampling procedures. Verify that the simulator produces
-realistic variability across episodes.
-
-#### Week 4: Delegation Engine.
-
-Implement the minimax-regret calculation using sampling or linear bounds
-and the epistemic-uncertainty safety gate. Integrate thresholds and
-decision logic into a clean API.
-
-#### Week 5: Integration and Debugging.
-
-Connect the user model, environment, and planner in a single loop. Run
-smoke tests demonstrating Buy versus Query decisions under different
-priors and thresholds.
-
-#### Week 6: Evaluation and Analysis.
-
-Run experiments across personas and stochastic seeds. Collect metrics,
-analyze trade-offs between regret, number of queries, no-purchase rate,
-and purchase rate, and produce plots and tables for the final report.
-
 # Evaluation and Success Criteria
 
 All evaluation will be conducted across multiple stochastic seeds,
@@ -543,7 +495,7 @@ defer.[@charpentier2022disentangling; @rigter2020minimax] This directly
 addresses the course requirement that the project incorporate
 stochasticity into the core decision-making process.
 
-::: thebibliography
+::: Works Cited
 9
 
 Shunyu Yao, Howard Chen, John Yang, and Karthik Narasimhan. WebShop:
