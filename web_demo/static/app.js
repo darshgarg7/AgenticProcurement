@@ -24,6 +24,13 @@ const cartTotalPrice = $('#cart-total-price');
 const checkoutBtn = $('#checkout-btn');
 const cartBadge = $('#cart-badge');
 const cartIconWrap = $('#cart-btn');
+const cartNavDropdown = $('#cart-nav-dropdown');
+const cndItems = $('#cnd-items');
+const cndFooter = $('#cnd-footer');
+const cndTotalPrice = $('#cnd-total-price');
+const cndClose = $('#cnd-close');
+const pauseBtn = $('#pause-btn');
+const stopBtn = $('#stop-btn');
 const logEntries = $('#log-entries');
 const resultOverlay = $('#result-overlay');
 const resultIcon = $('#result-icon');
@@ -36,6 +43,9 @@ const searchInput = $('#search-input');
 const searchDropdown = $('#search-dropdown');
 
 let isRunning = false;
+let isPaused = false;
+let isStopped = false;
+let _resumeResolve = null;
 let lastEpisodeData = null; // store for analysis
 let searchTimeout = null;
 
@@ -66,6 +76,21 @@ const SVG_STAR_SM = '<svg width="12" height="12" viewBox="0 0 24 24" fill="#ff99
 // ─── Slider update ─────────────────────────────────────────
 epsRegSlider.addEventListener('input', () => {
   epsRegVal.textContent = epsRegSlider.value;
+});
+
+// ─── Cart nav dropdown toggle ──────────────────────────────
+cartIconWrap.addEventListener('click', (e) => {
+  e.stopPropagation();
+  cartNavDropdown.classList.toggle('open');
+});
+cndClose.addEventListener('click', (e) => {
+  e.stopPropagation();
+  cartNavDropdown.classList.remove('open');
+});
+document.addEventListener('click', (e) => {
+  if (!$('#cart-wrapper').contains(e.target)) {
+    cartNavDropdown.classList.remove('open');
+  }
 });
 
 // ─── Close overlay ─────────────────────────────────────────
@@ -162,8 +187,9 @@ function flyToCart(cardEl) {
   }, 600);
 }
 
-// ─── Add item to cart sidebar ──────────────────────────────
+// ─── Add item to cart sidebar + nav dropdown ───────────────
 function addToCart(product) {
+  // Sidebar cart
   const empty = cartItems.querySelector('.cart-empty');
   if (empty) empty.remove();
 
@@ -183,6 +209,23 @@ function addToCart(product) {
   cartTotal.style.display = 'flex';
   cartTotalPrice.textContent = '$' + product.price.toFixed(2);
   checkoutBtn.style.display = 'block';
+
+  // Nav dropdown cart
+  cndItems.innerHTML = '';
+  const cndItem = document.createElement('div');
+  cndItem.className = 'cnd-item';
+  cndItem.innerHTML = `
+    <div class="cnd-item-icon">${product.emoji}</div>
+    <div class="cnd-item-info">
+      <div class="cnd-item-name">${product.name}</div>
+      <div class="cnd-item-meta">${product.category} · ${product.rating}★ · Quality ${product.quality}%</div>
+      <span class="cnd-item-badge">✓ Purchased</span>
+    </div>
+    <div class="cnd-item-price">$${product.price.toFixed(2)}</div>
+  `;
+  cndItems.appendChild(cndItem);
+  cndFooter.style.display = 'flex';
+  cndTotalPrice.textContent = '$' + product.price.toFixed(2);
 }
 
 // ─── Animate checkout ──────────────────────────────────────
@@ -197,9 +240,34 @@ function animateCheckout() {
   });
 }
 
-// ─── Delay utility ─────────────────────────────────────────
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+// ─── Pause / Stop button handlers ────────────────────────
+pauseBtn.addEventListener('click', () => {
+  if (isPaused) {
+    isPaused = false;
+    if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
+    pauseBtn.innerHTML = '&#9646;&#9646; Pause';
+    pauseBtn.classList.remove('resuming');
+  } else {
+    isPaused = true;
+    pauseBtn.innerHTML = '&#9654; Resume';
+    pauseBtn.classList.add('resuming');
+  }
+});
+
+stopBtn.addEventListener('click', () => {
+  isStopped = true;
+  isPaused = false;
+  if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
+});
+
+// ─── Delay utility (pause/stop aware) ─────────────────────
+async function wait(ms) {
+  if (isStopped) return;
+  await new Promise(resolve => setTimeout(resolve, ms));
+  if (isStopped) return;
+  if (isPaused) {
+    await new Promise(resolve => { _resumeResolve = resolve; });
+  }
 }
 
 // ─── Episode API: prefer SSE, fall back to POST ─────────────
@@ -249,6 +317,9 @@ function resetUI() {
   checkoutBtn.classList.remove('success');
   checkoutBtn.innerHTML = '<svg class=\"btn-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"20 6 9 17 4 12\"/></svg> Checkout';
   cartBadge.textContent = '0';
+  cndItems.innerHTML = '<p class="cnd-empty">Your cart is empty</p>';
+  cndFooter.style.display = 'none';
+  cartNavDropdown.classList.remove('open');
   logEntries.innerHTML = '';
   statusStrip.style.display = 'none';
   progressBar.style.width = '0%';
@@ -259,8 +330,13 @@ function resetUI() {
 async function runEpisode() {
   if (isRunning) return;
   isRunning = true;
+  isPaused = false;
+  isStopped = false;
+  _resumeResolve = null;
   runBtn.disabled = true;
   runBtn.textContent = 'Running...';
+  pauseBtn.style.display = 'inline-block';
+  stopBtn.style.display = 'inline-block';
   resetUI();
 
   const params = {
@@ -283,6 +359,7 @@ async function runEpisode() {
 
     // Animate through steps
     for (let i = 0; i < totalSteps; i++) {
+      if (isStopped) break;
       const step = data.steps[i];
       const pct = ((i + 1) / totalSteps) * 100;
       progressBar.style.width = pct + '%';
@@ -428,6 +505,12 @@ async function runEpisode() {
   }
 
   isRunning = false;
+  isPaused = false;
+  isStopped = false;
+  pauseBtn.style.display = 'none';
+  pauseBtn.classList.remove('resuming');
+  pauseBtn.innerHTML = '&#9646;&#9646; Pause';
+  stopBtn.style.display = 'none';
   runBtn.disabled = false;
   runBtn.textContent = '▶  Start Shopping';
 }
