@@ -29,6 +29,8 @@ const cndItems = $('#cnd-items');
 const cndFooter = $('#cnd-footer');
 const cndTotalPrice = $('#cnd-total-price');
 const cndClose = $('#cnd-close');
+const pauseBtn = $('#pause-btn');
+const stopBtn = $('#stop-btn');
 const logEntries = $('#log-entries');
 const resultOverlay = $('#result-overlay');
 const resultIcon = $('#result-icon');
@@ -41,6 +43,9 @@ const searchInput = $('#search-input');
 const searchDropdown = $('#search-dropdown');
 
 let isRunning = false;
+let isPaused = false;
+let isStopped = false;
+let _resumeResolve = null;
 let lastEpisodeData = null; // store for analysis
 let searchTimeout = null;
 
@@ -235,9 +240,34 @@ function animateCheckout() {
   });
 }
 
-// ─── Delay utility ─────────────────────────────────────────
-function wait(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+// ─── Pause / Stop button handlers ────────────────────────
+pauseBtn.addEventListener('click', () => {
+  if (isPaused) {
+    isPaused = false;
+    if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
+    pauseBtn.innerHTML = '&#9646;&#9646; Pause';
+    pauseBtn.classList.remove('resuming');
+  } else {
+    isPaused = true;
+    pauseBtn.innerHTML = '&#9654; Resume';
+    pauseBtn.classList.add('resuming');
+  }
+});
+
+stopBtn.addEventListener('click', () => {
+  isStopped = true;
+  isPaused = false;
+  if (_resumeResolve) { _resumeResolve(); _resumeResolve = null; }
+});
+
+// ─── Delay utility (pause/stop aware) ─────────────────────
+async function wait(ms) {
+  if (isStopped) return;
+  await new Promise(resolve => setTimeout(resolve, ms));
+  if (isStopped) return;
+  if (isPaused) {
+    await new Promise(resolve => { _resumeResolve = resolve; });
+  }
 }
 
 // ─── Reset UI ──────────────────────────────────────────────
@@ -262,8 +292,13 @@ function resetUI() {
 async function runEpisode() {
   if (isRunning) return;
   isRunning = true;
+  isPaused = false;
+  isStopped = false;
+  _resumeResolve = null;
   runBtn.disabled = true;
   runBtn.textContent = 'Running...';
+  pauseBtn.style.display = 'inline-block';
+  stopBtn.style.display = 'inline-block';
   resetUI();
 
   const params = {
@@ -291,6 +326,7 @@ async function runEpisode() {
 
     // Animate through steps
     for (let i = 0; i < totalSteps; i++) {
+      if (isStopped) break;
       const step = data.steps[i];
       const pct = ((i + 1) / totalSteps) * 100;
       progressBar.style.width = pct + '%';
@@ -436,6 +472,12 @@ async function runEpisode() {
   }
 
   isRunning = false;
+  isPaused = false;
+  isStopped = false;
+  pauseBtn.style.display = 'none';
+  pauseBtn.classList.remove('resuming');
+  pauseBtn.innerHTML = '&#9646;&#9646; Pause';
+  stopBtn.style.display = 'none';
   runBtn.disabled = false;
   runBtn.textContent = '▶  Start Shopping';
 }

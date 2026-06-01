@@ -174,6 +174,22 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:#eaeded;c
 .btn-run:hover{background:#e68a00;box-shadow:0 2px 4px rgba(0,0,0,.25)}
 .btn-run:active{transform:scale(.98)}
 .btn-run:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-pause{
+  padding:10px 22px;border:none;border-radius:4px;
+  background:#0066c0;color:#fff;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .15s;
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.btn-pause:hover{background:#0055a3}
+.btn-pause.resuming{background:#067d62}
+.btn-pause.resuming:hover{background:#045c48}
+.btn-stop{
+  padding:10px 22px;border:none;border-radius:4px;
+  background:#c7511f;color:#fff;font-weight:700;font-size:.95rem;
+  cursor:pointer;transition:all .15s;
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.btn-stop:hover{background:#a8431a}
 
 /* ─── Status Strip ───────────────────────────────────────── */
 .status-strip{
