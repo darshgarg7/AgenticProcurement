@@ -2,6 +2,40 @@
 
 ---
 
+## May 31, 2026
+
+### Commits `1bfb1e2`, `d6b420f`, `24cebd4` — Web Demo UI Improvements
+
+**`1bfb1e2` — Add cart nav dropdown: click cart icon to view purchased items**
+- Added a floating dropdown anchored to the cart icon in the top nav bar that opens when the icon is clicked
+- Dropdown displays the purchased item's emoji, full name, category, star rating, quality percentage, a green "✓ Purchased" badge, and price
+- A footer row shows the running total
+- Closes on the ✕ button, a click outside the wrapper, or automatically when a new episode run starts (`resetUI()`)
+- Changes spanned all three frontend files:
+  - `index.html`: wrapped cart icon in `.cart-wrapper`; added `.cart-nav-dropdown` with header, `.cnd-items` list, and `.cnd-footer` total
+  - `style.css`: added `.cart-wrapper` (position: relative), `.cart-nav-dropdown` (absolute-positioned, 300 px wide, `cardAppear` slide-in animation), and all `.cnd-*` child styles
+  - `app.js`: added DOM refs, toggle/close event handlers with click-outside detection, and updated `addToCart()` and `resetUI()` to populate and clear the dropdown
+
+**`d6b420f` — Add Pause/Resume and Stop controls to episode animation**
+- Added two new control buttons that appear in the hero bar only during an active run:
+  - **⏸ Pause** (blue) — freezes the animation loop between steps; the button label toggles to **▶ Resume** (green) when paused
+  - **■ Stop** (red) — immediately breaks out of the step loop and re-enables the Start button
+- Rewrote the `wait(ms)` helper to be pause/stop-aware: returns instantly when `isStopped` is true; suspends execution in a held Promise when `isPaused` is true and only resolves when `_resumeResolve()` is called on resume
+- Added `isPaused`, `isStopped`, and `_resumeResolve` state variables; all three are reset at the start of each new episode
+- Added a `if (isStopped) break` guard at the top of the step loop so a stop mid-animation cleanly exits without processing further steps
+- Button visibility is managed entirely by `runEpisode()`: shown at run start, hidden on natural completion or stop
+
+**`24cebd4` — Fix mismatched product emojis: water bottle, jump rope, belt, blender, bike light**
+- Audited all 60 entries in `web_demo/product_emojis.py` against their product noun labels
+- Corrected 5 clearly wrong mappings:
+  - `Water Bottle`: `🧴` (lotion pump bottle) → `🍶` (neutral bottle shape)
+  - `Jump Rope`: `⏭️` (media next-track button) → `🪢` (rope/knot)
+  - `Belt`: `👔` (necktie) → `🎗️` (ribbon/strap)
+  - `Blender`: `🫙` (mason jar) → `🥤` (cup with straw, representing a blended drink)
+  - `Bike Light`: `🚲` (whole bicycle) → `🔦` (flashlight/torch)
+
+---
+
 ## May 11, 2026
 
 ### Commit `95a2753` — Fix Page Layout Gaps and Recompile PDF
